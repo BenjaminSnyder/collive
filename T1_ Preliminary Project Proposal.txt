@@ -1,0 +1,34 @@
+﻿Assignment T1: Preliminary Project Proposal
+
+
+Part 1:
+* Nothing has changed.
+
+
+Part 2:
+1. What will our service do? What kind of functionality or features will it provide? 
+
+
+Our service allows users to query for songs and returns related information (lyrics, singer, etc.). 
+
+
+Service that allows clients to edit code/text collaboratively in real time (like google docs). It makes revisions available during a period without requests. 
+
+
+2. Who or what will be its users?  What might they use the functionality for?  
+
+
+The intended users are the developers of various IDEs/text editors (like VSCode) or business tools like Microsoft Office. These users will use the functionality for developing real-time collaboration capabilities. 
+
+
+3. What kind of data will your service create or accumulate?  What will the data be used for?
+
+
+Part 3:
+1. How will you test that your service does what it is supposed to do and provides the intended functionality?  
+
+
+2. How will you check that your service does not behave badly if its clients use it in unintended ways or provide invalid inputs? 
+
+
+3. How will you test that your service handles its data the way it's supposed to?
