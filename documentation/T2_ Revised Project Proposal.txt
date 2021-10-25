@@ -1,0 +1,184 @@
+﻿Assignment T2: Revised Project Proposal
+
+
+Part 1:
+* Team: Pyoneers
+   * Andrew Tang, at3456
+   * Benjamin Snyder, bs3148
+   * Raymond Fang, rjf2157 
+   * Jordan Dreibelbis, jed2205 
+   * Bryce Natter, bdn2113
+* Nothing has changed.
+* Met with IA 10/22 at 6pm.
+
+
+Part 2:
+1. What will our service do? What kind of functionality or features will it provide? 
+        Real-Time-editing-as-a-Service 
+
+
+Our service offers an API that software engineers can use to include real-time editing into a product that they are designing. It offers simple implementation handling all of the version control and real-time aspects for the developer. 
+
+
+Saving is done when the programmer has their software send a post request to the service. This can be as frequently as every character change, the programmer sends the entire file as a string to the API and the API creates a “diff” from the local document revision and updates the remote version with the diff. 
+
+
+Conflicts are resolved through a simple queue system that orders changes on the scale of microseconds. In the unlikely event that two changes occur at the exact same time, we pick one randomly. 
+
+
+Users can create documents and share them with other users. Users can only access documents that they have created or documents that have been shared with them; unauthorized users cannot view the data of documents that are not shared with them.
+
+
+Users can request a version history of the document, and revert to a previous version of the document.
+The APIs we are including are:
+* Auth0 for authentication (users logging in and accessing their shared documents)
+* Bing Spell Check API (checking text documents to find words that are likely misspelled)
+* Cloudmersive PDF conversion API/ Word export (converts text file to PDF/Word)
+* Hashify API (for checking that two text documents are the same)
+
+
+2. Who or what will be its users?  What might they use the functionality for?  
+
+
+User Story #1: Code Editor
+As an IDE for writing software, I want an API that can handle real-time collaborative code editing, so that my users can work on code together at the same time.
+Conditions of Satisfaction:
+* The API should accept the file and timestamp as input.
+* It should return the newest copy of the file whenever I request an updated copy (as close to real-time in this case).
+
+
+User Story #2: Shared Text Documents
+As a shared text document app, I want an API that enables users to edit the same text document concurrently, so that users can collaborate with each other in real-time.
+Conditions of Satisfaction:
+* The API should accept the file and timestamp as input, and return the newest copy of the file when I request it.
+* The API should allow spell-checking the file, identifying which words are likely to be misspelled.
+
+
+User Story #3: Classroom discussion board
+As a discussion board app, I want an API that allows users to create and respond to posts in real time to help facilitate discussion between users.
+Conditions of Satisfaction
+* The API should be able to update the discussion board after a user has submitted a post or responded to a post. 
+* Users viewing a post should be able to see updates to the post in real time.
+
+
+Who will be the users?
+The intended users are the software developers of various IDEs/text editors (like VSCode) or business tools like Microsoft Office or web-apps that need real-time multi-user editing. These software developers will use the functionality for developing real-time collaboration capabilities.
+
+
+3. What kind of data will your service create or accumulate?  What will the data be used for?
+
+
+Our service will store UTF-8 (text). The service will use Auth0 for authentication. We will offer statistics about the file, and the full document back to the users. 
+________________
+# Provides a diff from local to remote revision
+GET document/{documentID} 
+        Auth ID: user auth info 
+        current rev{string or null}: hash of revision you have locally
+                @returns 
+                “diff patch” to apply to the local document to update it
+
+
+        # Deletes document
+        DELETE document/{documentID}
+
+
+        # Receives diffs from users to a document
+        POST document/{documentID}/updateDocument
+                Auth ID: user auth info
+                current rev{string or null}: hash of revision you have locally
+                diff{JSON}: content of diff patch to put on the server
+                timestamp: a timestamp for the diff so we know the order to 
+           apply them
+# returns user details
+GET user/{userID} 
+                @returns the user’s details
+
+
+        # creates a user
+        POST user/{userID}/create/
+                anonymousID and documentID
+
+
+        # returns confirmation of authentication 
+        GET auth/document/{docID}/user/{userID}
+                qs above
+                @returns auth string
+
+
+        # returns a document ID for the newly created document
+        POST document/create
+                name: name of document
+                users/auth ids allowed?
+                @returns documentID
+
+
+        # updates the authenticated users for a doc
+        PATCH document/{documentID}/updateAuth
+                authID list: adds auth ids to the doc
+
+
+# replaces the current remote revision 
+PUT document/{docID}/revision/{revision ID}
+
+
+# Squash revisions for past X time
+POST document/{docID}/revision/{revisionID}/create
+name*
+
+
+
+
+Part 3:
+
+
+        For no client testing we will use a lot of unit testing, since this is entirely testing business logic. Below we have expanded on ideas for our full testing suite, including integration testing and manual testing that would require mock clients. 
+
+
+1. How will you test that your service does what it is supposed to do and provides the intended functionality?  
+   1. unit testing (use valid inputs)
+      1. We will write a minimum of three unit tests for each parameter of every method, covering typical, atypical, and invalid user inputs.
+   2. integration testing 
+      1. ensuring that a script that uses the services together could run from end to end (creating a document and users and entering input and then checking the result against expected document results that were manually generated)
+      2. See whether the correct results occur when the following events (or a similar permutation of them) occur in sequence:
+         1. Create a user X
+         2. Create a user Y
+         3. User X creates a document
+         4. User X shares the document with user Y
+         5. User X adds text to the document
+         6. User Y deletes text from the document
+         7. User X reverts the document back to before user Y deleted text
+   3. manual testing -- literally “testing by hand”
+      1. manually checking that the correct data is returned when we submit correct inputs, if hooked up to a mock gui, or tested with postman. 
+2. How will you check that your service does not behave badly if its clients use it in unintended ways or provide invalid inputs? 
+   1. unit testing (use invalid inputs)
+      1. null, empty inputs -- eg null diff
+      2. invalid inputs -- (weird characters, numbers instead of strings, etc) 
+      3. invalid auth -- unauthorized user attempt to edit
+      4. invalid resource path -- user attempts to edit a document that does not exist
+   2. manual testing
+      1. Postman
+      2. Ask people who have never seen the code to blackbox test the service and try to break the service with as many invalid inputs as possible.
+3. How will you test that your service handles its data the way it's supposed to?   
+   1. unit testing
+      1. For instance, we compare whether the document stored in the database is correct after the document is edited locally. 
+      2. To make sure that our files are not deleted when the server goes down: we can store our data locally, restart the server, then compare our local data with the server’s data. 
+   2. We will also make sure we sanitize our database inputs. Any user inputs will not be executed (no functions such as eval(), for instance), preventing malicious code injections.
+   3. We will ensure that unauthorized users cannot access documents that they are not allowed to access. 
+
+
+
+
+Part 4:
+Our service will use these APIs: 
+* Auth0 for authentication
+* Bing Spell Check API
+* Cloudmersive PDF conversion API/ Word export
+* Hashify API
+
+
+        Our tools for programming will use:
+* Pylint for style checking
+* Pychecker for static analysis bug finding
+* VS Code
+* Pytest for unit testing
+* Pytest-cov for coverage
