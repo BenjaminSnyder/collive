@@ -7,7 +7,7 @@ from users.user import User
 
 from authentication.auth import AuthError, requires_auth
 
-AUTH0_DOMAIN = 'collive.auth0.com'
+AUTH0_DOMAIN = 'dev-47fkm009.us.auth0.com'
 API_AUDIENCE = 'https://collive/api'
 ALGORITHMS = ["RS256"]
 
@@ -70,6 +70,7 @@ def delete_doc(doc_id):
     return msg
 
 @app.route('/getUser/<int:user_id>')
+@requires_auth
 def get_user():
     pass
 
