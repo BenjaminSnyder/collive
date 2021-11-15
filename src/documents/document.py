@@ -11,7 +11,7 @@ class Document():
     def deleteDocument(self, document_id):
         self.document_id = document_id
         self.database.deleteDocument(self.__convertToDict())
-        return self.document_id
+        return self.__convertToDict()
 
     def updateContent(self, content):
         if self.document_id is None:
@@ -19,13 +19,13 @@ class Document():
         self.revision += 1
         self.content = content
         self.database.insert(self.__convertToDict())
-        return "SUCCESS"
+        return self.__convertToDict()
 
     def createDocument(self):
         self.revision = 0
         dictionary = self.database.createDocument(self.__convertToDict())
         self.__dictToAttributes(dictionary)
-        return self.document_id
+        return self.__convertToDict()
 
     def __convertToDict(self):
         return {'document_id':self.document_id, 'name':self.name, 'content':self.content,
