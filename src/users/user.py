@@ -4,9 +4,9 @@ class User():
         self.database = Database("users")
         self.user_id = user_id
 
-    def deleteUser(self, content):
-        self.database.insert(self.__convertToDict())
-        return "SUCCESS"
+    #def deleteUser(self, content):
+    #    self.database.d(self.__convertToDict())
+    #    return "SUCCESS"
 
     def createUser(self, user_id):
         self.database.createUser(self.__convertToDict())
