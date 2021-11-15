@@ -2,7 +2,7 @@ from os import name
 from flask import Flask, request, Response, session, jsonify
 
 from documents.document import Document
-from authentication.auth import Auth # is this a class?
+from authentication.auth import Auth  # is this a class?
 from users.user import User
 
 from authentication.auth import AuthError, requires_auth
