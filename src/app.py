@@ -40,7 +40,7 @@ def update_doc():
     user_id = None # get user_id from auth, using auth_token
     data = request.get_json(force=True)
     doc = Document(user_id)
-    msg = doc.updateDocument(data['data'])
+    msg = doc.updateContent(data['data'])
     return msg
 
 @app.route('/document/create', methods=['POST'])
