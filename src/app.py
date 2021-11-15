@@ -5,6 +5,12 @@ from documents.document import Document
 from authentication.auth import Auth # is this a class?
 from users.user import User
 
+from authentication.auth import AuthError, requires_auth
+
+AUTH0_DOMAIN = 'collive.auth0.com'
+API_AUDIENCE = 'https://collive/api'
+ALGORITHMS = ["RS256"]
+
 app = Flask(__name__)
 app.config.from_mapping(SECRET_KEY='dev')
 
@@ -28,6 +34,7 @@ def login():
 '''
 
 @app.route('/document/get/<int:doc_id>')
+@requires_auth
 def get_doc(doc_id):
     auth_token = request.headers.get('Authorization')
     user_id = None # get user_id from auth, using auth_token
@@ -35,6 +42,7 @@ def get_doc(doc_id):
     return jsonify(doc.loadDocument(doc_id))
 
 @app.route('/document/update', methods=['POST'])
+@requires_auth
 def update_doc():
     auth_token = request.headers.get('Authorization')
     user_id = None # get user_id from auth, using auth_token
@@ -44,6 +52,7 @@ def update_doc():
     return msg
 
 @app.route('/document/create', methods=['POST'])
+@requires_auth
 def create_doc():
     auth_token = request.headers.get('Authorization')
     user_id = None # get user_id from auth, using auth_token
@@ -52,6 +61,7 @@ def create_doc():
     return msg
 
 @app.route('/document/delete/<int:doc_id>')
+@requires_auth
 def delete_doc(doc_id):
     auth_token = request.headers.get('Authorization')
     user_id = None # get user_id from auth, using auth_token
@@ -62,3 +72,10 @@ def delete_doc(doc_id):
 @app.route('/getUser/<int:user_id>')
 def get_user():
     pass
+
+@app.errorhandler(AuthError)
+@requires_auth
+def handle_auth_error(ex):
+    response = jsonify(ex.error)
+    response.status_code = ex.status_code
+    return response
