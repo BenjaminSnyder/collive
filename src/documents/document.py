@@ -12,22 +12,28 @@ class Document():
 
     def delete_document(self, document_id):
         self.document_id = document_id
-        self.database.delete_document(self.__convert_to_dict())
-        return self.__convert_to_dict()
+        dictionary = self.database.delete_document(self.__convert_to_dict())
+        if dictionary["document_id"] is not None:
+            return "ERROR: Document not deleted."
+        return "SUCCESS"
 
     def update_content(self, content):
         if self.document_id is None:
-            return "ERROR: Document not Loaded"
+            return "ERROR: Document not Loaded."
         self.revision += 1
         self.content = content
-        self.database.insert(self.__convert_to_dict())
-        return self.__convert_to_dict()
+        dictionary = self.database.insert(self.__convert_to_dict())
+        if dictionary["content"] is None:
+            return "ERROR: Document Content not updated."
+        return "SUCCESS"
 
     def create_document(self):
         self.revision = 0
         dictionary = self.database.create_document(self.__convert_to_dict())
+        if dictionary["document_id"] is None:
+            return "ERROR: Failed to create document."
         self.__dict_to_attributes(dictionary)
-        return self.__convert_to_dict()
+        return dictionary["document_id"]
 
     def __convert_to_dict(self):
         return {'document_id':self.document_id, 'name':self.name, 'content':self.content,
@@ -37,6 +43,7 @@ class Document():
         self.document_id = dictionary["document_id"]
         self.name = dictionary["name"]
         self.content = dictionary["content"]
+        self.revision = dictionary["revision"]
 
     document_id = None
     name = None
