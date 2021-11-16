@@ -1,18 +1,18 @@
 from flask import Flask, Response, request
 from functools import wraps
 
-API_KEYS = ['f2dOqweIWy65QWlwiw', 'a1wreoijWeR20lsdwq']
+TOKENS = ['f2dOqweIWy65QWlwiw', 'a1wreoijWeR20lsdwq']
 
-def valid_credentials(api_key):
-    return api_key in API_KEYS
+def valid_credentials(token):
+    return token in TOKENS
 
 def authenticate(f):
-    """Determines if the API key is valid:
+    """Determines if the access token is valid:
     """
     @wraps(f)
     def wrapper(*args, **kwargs):
-        key = request.headers.get("api_key")
-        if not key or not valid_credentials(key):
-            return Response('Invalid key', 401)
+        token = request.headers.get("token")
+        if not token or not valid_credentials(token):
+            return Response('Invalid token', 401)
         return f(*args, **kwargs)
     return wrapper
