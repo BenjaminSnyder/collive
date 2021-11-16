@@ -19,16 +19,23 @@ class AuthError(Exception):
         self.status_code = status_code
 
 # Generate Auth0 access token
+
+
 def make_access_token():
     conn = http.client.HTTPSConnection("dev-47fkm009.us.auth0.com")
-    payload = "{\"client_id\":\"lYNhbvJVrqgprj0WwQ6x5SqnTVAHLryJ\",\"client_secret\":\"j_GntBTetolYeu1UXpu3VAgLvbdGmC3AqrtDp3e7ZF-H8i-eIbQTVNoZe3LLksMs\",\"audience\":\"https://collive/api\",\"grant_type\":\"client_credentials\"}"
-    headers = { 'content-type': "application/json" }
+    payload = """{\"client_id\":\"lYNhbvJVrqgprj0WwQ6x5SqnTVAHLryJ\",
+    \"client_secret\":\"j_GntBTetolYeu1UXpu3VAgLvbdGmC3AqrtDp3e7ZF-H8i-eIbQTVNoZe3LLksMs\",
+    \"audience\":\"https://collive/api\",\"grant_type\":\"client_credentials\"}
+    """
+    headers = {'content-type': "application/json"}
     conn.request("POST", "/oauth/token", payload, headers)
     res = conn.getresponse()
     data = res.read()
     data = data.decode("utf-8")
 
 # Format error response and append status code
+
+
 def get_token_auth_header():
     """Obtains the Access Token from the Authorization Header
     """
@@ -93,7 +100,8 @@ def requires_auth(f):
                 raise AuthError({"code": "invalid_claims",
                                 "description":
                                     "incorrect claims,"
-                                    "please check the audience and issuer"}, 401)
+                                    "please check the audience and issuer"},
+                                401)
             except Exception:
                 raise AuthError({"code": "invalid_header",
                                 "description":

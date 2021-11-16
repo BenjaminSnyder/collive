@@ -152,4 +152,3 @@ class Document():
     users = None
     viewers = None
     token = None
-

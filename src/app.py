@@ -1,5 +1,4 @@
-from os import name
-from flask import Flask, request, Response, session, jsonify
+from flask import Flask, request, jsonify
 
 from documents.document import Document
 
@@ -20,7 +19,8 @@ app.config.from_mapping(SECRET_KEY='dev')
 @app.route('/document/get')
 @requires_auth
 def get_doc():
-    '''Returns the most recently updated document given doc_id and client_id in url parameters'''
+    '''Returns the most recently updated document
+     given doc_id and client_id in url parameters'''
     access_token = request.headers.get('Authorization')
     doc_id = request.args.get('doc_id')
     client_id = request.args.get('client_id')
@@ -32,7 +32,8 @@ def get_doc():
 @app.route('/document/update', methods=['POST'])
 @requires_auth
 def update_doc():
-    '''Updates document given doc_id and document content. Returns the status message'''
+    '''Updates document given doc_id and document
+     content. Returns the status message'''
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
 
