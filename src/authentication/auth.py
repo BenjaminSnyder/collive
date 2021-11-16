@@ -11,7 +11,7 @@ def authenticate(f):
     """
     @wraps(f)
     def wrapper(*args, **kwargs):
-        token = request.headers.get("token")
+        token = request.headers.get("Bearer")
         if not token or not valid_credentials(token):
             return Response('Invalid token', 401)
         return f(*args, **kwargs)
