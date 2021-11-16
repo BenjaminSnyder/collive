@@ -11,7 +11,7 @@ def authenticate(f):
     """
     @wraps(f)
     def wrapper(*args, **kwargs):
-        headers = flask.request.headers
+        headers = request.headers
         bearer = headers.get('Authorization')
         token = bearer.split()[1]
         if not token or not valid_credentials(token):
