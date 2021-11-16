@@ -1,39 +1,89 @@
 from tinydb import TinyDB, Query
-db = TinyDB('db.json')
 
+def r_pack(revision):
+    revision["type"] = "meta"
+    return revision
 
-class Database():
-    def __init__(self, devID):
-        self.docs = TinyDB(devID + '/docs.json')
+def m_pack(meta):
+    meta["type"] = "meta"
+    return meta
 
-    def create_document(self, doc):
-        doc["documentID"] = len(self.docs) + 1
-        self.docs.insert(doc)
+def unpack(data):
+    del data["type"]
+    return data
 
-    def insert_document(self, doc):
-        Doc = Query()
-        if(self.docs.contains((Doc.document_id == doc["documentID"])
-           and (Doc["revisionID"] == doc["revisionID"]))):
-            return ("Error: Document" + doc["documentID"] + ":" +
-                    doc["revisionID"] + " already exists.")
-        else:
-            self.docs.insert(doc)
+def open_database(token):
+    userdb = TinyDB('users.json')
+    User = Query()
+    link = db.search(User.tokens.any([token]))
+    try:
+        db = TinyDB(link[0]["database"] + '.json')
+        userdb.close()
+        return db
 
-    def get_document(self, doc):
-        Doc = Query()
-        try:
-            revisions = self.docs.search(
-                Doc["documentID"] == doc["documentID"])
-            return max(
-                revisions, key=lambda x: x['revisionID'])
+    except IndexError:
+        userdb.close()
+        return ("Error: token not associated with database")
 
-        except IndexError:
-            return ("Error: No document with ID:" + doc["documentID"])
+def open_document(token, doc_id):
+    db = open_database(token)
+    t = db.table("doc_id")
+    return t
 
-    def delete_document(self, doc):
-        Doc = Query()
-        if(self.docs.contains(Doc["documentID"] == doc["documentID"])):
-            self.docs.remove(Doc["documentID"] == doc["documentID"])
-        else:
-            return ("Document" + doc["documentID"] + "not found.")
+def create_document(token, meta, revision):
+    db = open_database(token)
+    m_id = len(db.tables())
+    meta["document_id"] = m_id
+    t = db.table(m_id)
+
+    t.insert(m_pack(meta))
+    t.insert(r_pack(revision))
+
+def insert_revision(token, doc_id, revision):
+    doc = open_document(token, doc_id)
+    if(len(doc) == 0):
+        return ("Error, no document with id: " + doc_id)
+
+    Rev = Query()
+    if(doc.contains(Rev["revision_hash"] == revision["revision_hash"])):
+        return ("Error: Document" + doc_id + "<" +
+                revision["revision_hash"] + "> already exists.")
+    else:
+        doc.insert(r_pack(revision))
+
+def get_revision(token, doc_id, revision_hash):
+    doc = open_document(token, doc_id)
+    if(len(doc) == 0):
+        return ("Error, no document with id: " + doc_id)
+
+    Rev = Query()
+    try:
+        revision = doc.search(Rev["revision_hash"] == revision_hash)[0]
+        return unpack(revision)
+
+    except IndexError:
+        return ("Error: No revision with hash:" + revision_hash)
+
+def update_meta(token, doc_id, meta):
+    doc = open_document(token, doc_id)
+    if(len(doc) == 0):
+        return ("Error, no document with id: " + doc_id)
+
+    Q = Query()
+    m = doc.get(Q.type == "meta")
+    doc.remove(doc_ids = m.doc_id)
+    doc.insert(m_pack(meta))
+
+def get_meta(token, doc_id):
+    doc = open_document(token, doc_id)
+    if(len(doc) == 0):
+        return ("Error, no document with id: " + doc_id)
+
+    Q = Query()
+    meta = doc.search(Q["type"] == "meta")[0]
+    return unpack(meta)
+
+def delete_document(token, doc_id):
+    db = open_database(token)
+    db.drop_table(doc_id)
 

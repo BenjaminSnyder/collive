@@ -20,7 +20,7 @@ class document_util:
 
         # Make some call to the database to get the content based on the hash
         '''
-        old_content = Document.get_revision(doc_id, local_revision_hash)
+        old_content = document.get_revision(doc_id, local_revision_hash)
         '''
 
         # Create diff_match_patch object
@@ -40,7 +40,7 @@ class document_util:
         patches = dmp.patch_make(diff)
 
         # Get the most recent revision for a document
-        current_revision = db.get_most_recent_revision(doc_id)
+        current_revision = document.get_most_recent_revision(doc_id)
 
         # Apply this patch (changes from their version to new content)
         # to the current revision
