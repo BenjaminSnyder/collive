@@ -42,5 +42,8 @@ class Document_Util:
     @staticmethod
     def create_hash(content: str) -> str:
         '''Sends the content to hashify to get a hash for the '''
-        req = requests.get(hashify_url + '?value=' + content)
-        return req.json()['Digest']
+        req = requests.get(f"{hashify_url}?value={content}")
+        if 'Digest' in req.json():
+            return req.json()['Digest']
+        else:
+            return Exception("There was an error with the Hashify API")

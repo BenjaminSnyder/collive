@@ -6,4 +6,5 @@ pytest
 pytest-cov
 pytest-srcpaths
 pytest-mock
+requests_mock
 tinydb
