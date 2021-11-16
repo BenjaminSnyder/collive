@@ -3,7 +3,6 @@ from flask import Flask, request, Response, session, jsonify
 
 from documents.document import Document
 from authentication.auth import Auth  # is this a class?
-from users.user import User
 
 from authentication.auth import AuthError, requires_auth
 
@@ -65,7 +64,7 @@ def delete_doc():
 
     doc = Document(access_token, input['client_id'])
     doc.load_document(input['doc_id'], input['client_id'])
-    
+
     msg = doc.deleteDocument(input['doc_id'])
     return msg
 
