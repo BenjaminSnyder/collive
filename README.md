@@ -12,6 +12,8 @@ Team Pyoneers
 Shared drive folder:
 https://drive.google.com/drive/folders/16GBnaf75uVPqliTXlQpbPQWAQkqMvayV?usp=sharing
 
+To run the service:
+In the src directory, do $$ export FLASK_APP=app $$. Then do $$ flask run $$. 
 
 API Entry Points
 
