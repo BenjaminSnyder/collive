@@ -4,3 +4,8 @@ python-jose
 flask-cors
 six
 diff_match_patch
+pylint
+pychecker
+pytest
+pytest-cov
+tinydb
