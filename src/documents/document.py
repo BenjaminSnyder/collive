@@ -1,6 +1,6 @@
 import database.db as db
 # import queue
-from documents.document_util import document_util
+from documents.document_util import Document_Util
 
 
 class Document():
@@ -33,7 +33,7 @@ class Document():
         else:
             return dict.fromkeys(doc, None)
 
-    def get_most_recent_revision(self, doc_id: str, hash: str) -> str:
+    def get_most_recent_revision(self) -> str:
         '''returns the current content'''
         return self.content
 
@@ -54,8 +54,8 @@ class Document():
             return "ERROR: Document not loaded."
         if self.__authorize_client(client_id, "u"):
             result = db.delete_document(
-                                        self.token,
-                                        self.__convert_to_dict())
+                self.token,
+                self.__convert_to_dict())
             if result is not None:
                 return result
         else:
@@ -72,15 +72,15 @@ class Document():
             return "ERROR: Document not loaded."
 
         if self.__authorize_client(client_id, "u"):
-            self.content = document_util.update_document(self,
+            self.content = Document_Util.update_document(self,
                                                          self.document_id,
                                                          self.content,
                                                          content)
             self.content = content
-            self.revision = document_util.create_hash(content)
+            self.revision = Document_Util.create_hash(content)
             result = db.insert_content(
-                                    self.token,
-                                    self.__convert_to_dict()[1])
+                self.token,
+                self.__convert_to_dict()[1])
             if result is not None:
                 return result
         return "SUCCESS"
@@ -109,12 +109,12 @@ class Document():
         name in the document database.
         '''
         self.name = name
-        self.revision = document_util.create_hash("")
+        self.revision = Document_Util.create_hash("")
         self.users = [client_id]
         self.viewers = [client_id]
         dictionary = db.create_document(
-                                            self.token,
-                                            self.__convert_to_dict())
+            self.token,
+            self.__convert_to_dict())
         if dictionary["document_id"] is None:
             return "ERROR: Could not create new document."
         self.__dict_to_attributes(dictionary)
