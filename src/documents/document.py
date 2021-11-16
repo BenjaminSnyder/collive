@@ -1,6 +1,6 @@
 from database.db import Database
 import queue
-from documents.diff import doc_util
+from documents.document_util import document_util
 
 class Document():
     '''Intermediate class for operations between the server actions and the database operations.'''
@@ -22,6 +22,9 @@ class Document():
         else:
             return dict.fromkeys(doc, None)
 
+    def get_revision(self, document_id):
+        pass
+
     def delete_document(self, client_id):
         '''Delete this document from the database if the given client is authenticated.'''
 
@@ -42,16 +45,17 @@ class Document():
             return "ERROR: Document not loaded."
 
         if self.__authorize_client(client_id, "u"):
+            self.content = document_util.update_documents(self.document_id, self.content, content)
             self.content = content
-            self.revision = doc_util.create_hash(content)
+            self.revision = document_util.create_hash(content)
             result = Database.insert_content(self.token, self.__convert_to_dict()[1])
             if result is not None:
                 return result
         return "SUCCESS"
-
+    
     def update_meta(self, name, users, viewers, client_id):
         '''Update the meta data of the document stored in the database with a client's meta data.'''
-        
+
         if self.document_id is None:
             return "ERROR: Document not loaded."
 
@@ -59,9 +63,7 @@ class Document():
             self.name = name
             self.users = users
             self.viewers = viewers
-            self.revision = create_hash(content)
-            result = Database.insert_meta(self.token,
-                                          self.__convert_to_dict()[0])
+            result = Database.insert_meta(self.token, self.__convert_to_dict()[0])
             if result is not None:
                 return result
         return "SUCCESS"
@@ -70,9 +72,11 @@ class Document():
         pass
 
     def create_document(self, name, client_id):
-        self.revision = doc_util.create_hash("")
+        '''Creates a new document with a given name in the document database.'''
+        self.name = name
+        self.revision = document_util.create_hash("")
         self.users = [client_id]
-        dictionary = self.database.create_document(self.token, self.__convert_to_dict())
+        dictionary = self.database.create_document(self.token, self.__convert_to_dict()[0])
         if dictionary["document_id"] is None:
             return "ERROR: Could not create new document."
         self.__dict_to_attributes(dictionary)
@@ -104,6 +108,5 @@ class Document():
     database = None
     revision = None
     users = None
-    revisionHistory = {}
     viewers = None
 
