@@ -1,18 +1,23 @@
 from tinydb import TinyDB, Query
 
+
 def r_pack(revision):
     revision["type"] = "meta"
     return revision
+
 
 def m_pack(meta):
     meta["type"] = "meta"
     return meta
 
+
 def unpack(data):
     del data["type"]
     return data
 
-def open_database(token):
+
+def open_database(token) -> TinyDB:
+    '''opens a database connection'''
     userdb = TinyDB('users.json')
     User = Query()
     link = userdb.search(User.tokens.any([token]))
@@ -25,12 +30,16 @@ def open_database(token):
         userdb.close()
         return ("Error: token not associated with database")
 
+
 def open_document(token, doc_id):
+    '''creates a new database table for a document by id'''
     db = open_database(token)
     t = db.table("doc_id")
     return t
 
+
 def create_document(token, meta, revision):
+    '''creates a new document given a token, metadata and intial revision'''
     db = open_database(token)
     m_id = len(db.tables())
     meta["document_id"] = m_id
@@ -39,7 +48,9 @@ def create_document(token, meta, revision):
     t.insert(m_pack(meta))
     t.insert(r_pack(revision))
 
+
 def insert_revision(token, doc_id, revision):
+    '''inserts a revision(rev[hash] = content) into a document by id'''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
         return ("Error, no document with id: " + doc_id)
@@ -51,7 +62,9 @@ def insert_revision(token, doc_id, revision):
     else:
         doc.insert(r_pack(revision))
 
+
 def get_revision(token, doc_id, revision_hash):
+    '''returns a document revision by hash '''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
         return ("Error, no document with id: " + doc_id)
@@ -64,7 +77,9 @@ def get_revision(token, doc_id, revision_hash):
     except IndexError:
         return ("Error: No revision with hash:" + revision_hash)
 
+
 def update_meta(token, doc_id, meta):
+    '''updates document meta data'''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
         return ("Error, no document with id: " + doc_id)
@@ -74,7 +89,9 @@ def update_meta(token, doc_id, meta):
     doc.remove(doc_ids = m.doc_id)
     doc.insert(m_pack(meta))
 
+
 def get_meta(token, doc_id):
+    '''returns metadata for a document'''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
         return ("Error, no document with id: " + doc_id)
@@ -83,7 +100,8 @@ def get_meta(token, doc_id):
     meta = doc.search(Q["type"] == "meta")[0]
     return unpack(meta)
 
+
 def delete_document(token, doc_id):
+    '''deletes a document by id'''
     db = open_database(token)
     db.drop_table(doc_id)
-
