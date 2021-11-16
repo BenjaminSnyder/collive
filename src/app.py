@@ -27,8 +27,8 @@ def get_doc():
     doc_id = request.args.get('doc_id')
     client_id = request.args.get('client_id')
 
-    doc = Document(access_token, client_id)
-    return jsonify(doc.loadDocument(doc_id))
+    doc = Document(access_token)
+    return jsonify(doc.loadDocument(doc_id, client_id))
 
 # Updates document given doc_id and document content. Returns the status message.
 @app.route('/document/update', methods=['POST'])
@@ -38,7 +38,9 @@ def update_doc():
     input = request.get_json(force=True)
 
     doc = Document(access_token, input['client_id'])
-    msg = doc.updateContent(input['content'])
+    doc.load_document(input['doc_id'], input['client_id'])
+
+    msg = doc.updateContent(input['content'], input['client_id'])
     return msg
 
 # Creates a document for a client, returns status message. 
@@ -48,8 +50,10 @@ def create_doc():
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
 
-    doc = Document(access_token, input['client_id'])
-    msg = doc.createDocument()
+    doc = Document(access_token)
+    doc.load_document(input['doc_id'], input['client_id'])
+
+    msg = doc.createDocument(input['client_id'])
     return msg
 
 # Deletes a document given doc_id and client_id. 
@@ -60,12 +64,14 @@ def delete_doc():
     input = request.get_json(force=True)
 
     doc = Document(access_token, input['client_id'])
+    doc.load_document(input['doc_id'], input['client_id'])
+    
     msg = doc.deleteDocument(input['doc_id'])
     return msg
 
-@app.route('/getUser/<int:database_id>')
+@app.route('/client/add', methods=['POST'])
 @requires_auth
-def get_user():
+def add_client():
     pass
 
 @app.errorhandler(AuthError)
