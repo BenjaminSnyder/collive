@@ -43,7 +43,7 @@ def update_doc():
 
 @app.route('/document/create', methods=['POST'])
 @authenticate
-async def create_doc():
+def create_doc():
     '''Creates a document for a client, returns status message'''
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
@@ -56,7 +56,7 @@ async def create_doc():
 
 @app.route('/document/delete', methods=['POST'])
 @authenticate
-async def delete_doc():
+def delete_doc():
     '''Deletes a document given doc_id and client_id'''
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
@@ -76,5 +76,5 @@ def create_token():
 
 @app.route('/client/add', methods=['POST'])
 @authenticate
-async def add_client():
+def add_client():
     pass
