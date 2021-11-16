@@ -78,7 +78,7 @@ def update_meta(token, doc_id, meta):
 
     Q = Query()
     m = doc.get(Q.type == "meta")
-    doc.remove(doc_ids=m.doc_id)
+    doc.remove(doc_ids=[m.doc_id])
     doc.insert(m_pack(meta))
 
 

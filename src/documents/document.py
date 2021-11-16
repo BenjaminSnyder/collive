@@ -24,7 +24,7 @@ class Document():
         '''
 
         meta = db.get_meta(self.token, document_id)
-        doc = db.get_revision(self.token, document_id, meta["cur_revision"])
+        doc = db.get_revision(self.token, document_id, meta["curr_revision"])
         if type(doc) != dict:
             return doc
         if self.__authorize_client(doc, client_id, 'v'):
@@ -55,7 +55,7 @@ class Document():
         if self.__authorize_client(client_id, "u"):
             result = db.delete_document(
                 self.token,
-                self.__convert_to_dict())
+                self.document_id)
             if result is not None:
                 return result
         else:
@@ -98,7 +98,7 @@ class Document():
             self.name = name
             self.users = users
             self.viewers = viewers
-            result = db.update_meta(self.token, self.__convert_to_dict()[0])
+            result = db.update_meta(self.token, self.document_id, self.__convert_to_dict()[0])
             if result is not None:
                 return result
         return "SUCCESS"
@@ -112,13 +112,13 @@ class Document():
         self.revision = Document_Util.create_hash("")
         self.users = [client_id]
         self.viewers = [client_id]
-        dictionary = db.create_document(
+        document_id = db.create_document(
             self.token,
-            self.__convert_to_dict())
-        if dictionary["document_id"] is None:
+            self.__convert_to_dict()[0], self.__convert_to_dict()[1])
+        if document_id is None:
             return "ERROR: Could not create new document."
-        self.__dict_to_attributes(dictionary)
-        return dictionary["document_id"]
+        self.document_id = document_id
+        return document_id
 
     def __authorize_client(self, client_id, mode):
         if mode == "u":
@@ -129,12 +129,12 @@ class Document():
 
     def __convert_to_dict(self):
         '''Private method to convert class attributes to a dict'''
-        return {'document_id': self.document_id,
+        return [{'document_id': self.document_id,
                 'curr_revision': self.revision,
                 'name': self.name,
                 'users': self.users,
                 "viewers": self.viewers}, {'content': self.content,
-                                           'revision': self.revision}
+                                           'revision': self.revision}]
 
     def __dict_to_attributes(self, meta, doc):
         '''Private method to convert a dict to class attributes'''

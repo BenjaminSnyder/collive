@@ -22,7 +22,7 @@ def test_get_most_recent_revision():
     doc = Document("test")
     assert doc.get_most_recent_revision() is None
     doc.content = "content"
-    assert doc.get_most_recent_revision == "content"
+    assert doc.get_most_recent_revision() == "content"
 
 
 def test_get_revision_by_hash():
@@ -94,6 +94,7 @@ def test_update_meta():
 
     dictionary = doc.load_document(doc_id, "client")
     rev = doc.revision
+    print(dictionary)
     assert dictionary["document_id"] == doc_id
     assert dictionary["revision"] == doc.revision
     assert dictionary["name"] == "newName.txt"
@@ -121,28 +122,9 @@ def test_update_meta():
 
 def test_create_document():
     doc = Document("test")
-    response = doc.create_document()
-    assert response != "ERROR: Could not crate new document."
-    doc_id = doc.create_document()
-    dictionary = doc.load_document(doc_id)
+    doc_id = doc.create_document("create_doc.txt", "client")
+    assert doc_id != "ERROR: Could not crate new document."
+    dictionary = doc.load_document(doc_id, "client")
     response = doc.update_content(
-        "update_doc.txt", "This is a a doc to update")
+        "This is a a doc to update", "client")
     assert response == "SUCCESS"
-
-    dictionary = doc.load_document(doc_id)
-
-    assert dictionary["document_id"] == doc_id
-    assert dictionary["revision"] == "1"
-    assert dictionary["name"] == "update_doc_txt"
-    assert dictionary["content"] == "This is a doc to update"
-
-    response = doc.update_content(
-        "update_doc.txt", "This is a a doc to update version 2")
-    assert response == "SUCCESS"
-    assert dictionary["document_id"] == doc_id
-    assert dictionary["revision"] == "2"
-    assert dictionary["name"] == "update_doc_txt"
-    assert dictionary["content"] == "This is a doc to update verion 2"
-
-    response = doc.update_content("error_doc")
-    assert response == "ERROR: Document does not exist"
