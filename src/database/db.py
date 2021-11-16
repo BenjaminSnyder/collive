@@ -15,7 +15,7 @@ def unpack(data):
 def open_database(token):
     userdb = TinyDB('users.json')
     User = Query()
-    link = db.search(User.tokens.any([token]))
+    link = userdb.search(User.tokens.any([token]))
     try:
         db = TinyDB(link[0]["database"] + '.json')
         userdb.close()

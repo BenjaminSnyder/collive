@@ -2,6 +2,7 @@ import database.db as db
 import queue
 from documents.document_util import document_util
 
+
 class Document():
     '''
     Intermediate class for operations between the server
