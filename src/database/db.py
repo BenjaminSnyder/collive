@@ -2,7 +2,7 @@ from tinydb import TinyDB, Query
 
 
 def r_pack(revision):
-    revision["type"] = "meta"
+    revision["type"] = "revision"
     return revision
 
 
@@ -18,23 +18,14 @@ def unpack(data):
 
 def open_database(token) -> TinyDB:
     '''opens a database connection'''
-    userdb = TinyDB('users.json')
-    User = Query()
-    link = userdb.search(User.tokens.any([token]))
-    try:
-        db = TinyDB(link[0]["database"] + '.json')
-        userdb.close()
-        return db
-
-    except IndexError:
-        userdb.close()
-        return ("Error: token not associated with database")
+    db = TinyDB(token + ".json")
+    return db
 
 
 def open_document(token, doc_id):
     '''creates a new database table for a document by id'''
     db = open_database(token)
-    t = db.table("doc_id")
+    t = db.table(str(doc_id))
     return t
 
 
@@ -42,11 +33,12 @@ def create_document(token, meta, revision):
     '''creates a new document given a token, metadata and intial revision'''
     db = open_database(token)
     m_id = len(db.tables())
-    meta["document_id"] = m_id
-    t = db.table(m_id)
+    meta["document_id"] = str(m_id)
+    t = db.table(str(m_id))
 
     t.insert(m_pack(meta))
     t.insert(r_pack(revision))
+    return "" + str(m_id)
 
 
 def insert_revision(token, doc_id, revision):
@@ -82,7 +74,7 @@ def update_meta(token, doc_id, meta):
     '''updates document meta data'''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
-        return ("Error, no document with id: " + doc_id)
+        return ("Error, no document with id: " + str(doc_id))
 
     Q = Query()
     m = doc.get(Q.type == "meta")
@@ -94,7 +86,7 @@ def get_meta(token, doc_id):
     '''returns metadata for a document'''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
-        return ("Error, no document with id: " + doc_id)
+        return ("Error, no document with id: " + str(doc_id))
 
     Q = Query()
     meta = doc.search(Q["type"] == "meta")[0]
@@ -104,4 +96,4 @@ def get_meta(token, doc_id):
 def delete_document(token, doc_id):
     '''deletes a document by id'''
     db = open_database(token)
-    db.drop_table(doc_id)
+    db.drop_table(str(doc_id))
