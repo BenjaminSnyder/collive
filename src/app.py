@@ -2,11 +2,8 @@ from flask import Flask, request, jsonify
 
 from documents.document import Document
 
-from authentication.auth import AuthError, requires_auth
+from authentication.auth import authenticate
 
-AUTH0_DOMAIN = 'dev-47fkm009.us.auth0.com'
-API_AUDIENCE = 'https://collive/api'
-ALGORITHMS = ["RS256"]
 
 app = Flask(__name__)
 app.config.from_mapping(SECRET_KEY='dev')
@@ -17,7 +14,7 @@ app.config.from_mapping(SECRET_KEY='dev')
 
 
 @app.route('/document/get')
-@requires_auth
+@authenticate
 def get_doc():
     '''Returns the most recently updated document
      given doc_id and client_id in url parameters'''
@@ -30,7 +27,7 @@ def get_doc():
 
 
 @app.route('/document/update', methods=['POST'])
-@requires_auth
+@authenticate
 def update_doc():
     '''Updates document given doc_id and document
      content. Returns the status message'''
@@ -45,22 +42,21 @@ def update_doc():
 
 
 @app.route('/document/create', methods=['POST'])
-@requires_auth
-def create_doc():
+@authenticate
+async def create_doc():
     '''Creates a document for a client, returns status message'''
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
 
     doc = Document(access_token)
-    doc.load_document(input['doc_id'], input['client_id'])
 
-    msg = doc.createDocument(input['client_id'])
-    return msg
+    doc_id = doc.createDocument(input['client_id'])
+    return doc_id
 
 
 @app.route('/document/delete', methods=['POST'])
-@requires_auth
-def delete_doc():
+@authenticate
+async def delete_doc():
     '''Deletes a document given doc_id and client_id'''
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
@@ -72,15 +68,13 @@ def delete_doc():
     return msg
 
 
-@app.route('/client/add', methods=['POST'])
-@requires_auth
-def add_client():
+@app.route('/token/create')
+def create_token():
+    '''Generates a database and returns the access_token'''
     pass
 
 
-@app.errorhandler(AuthError)
-@requires_auth
-def handle_auth_error(ex):
-    response = jsonify(ex.error)
-    response.status_code = ex.status_code
-    return response
+@app.route('/client/add', methods=['POST'])
+@authenticate
+async def add_client():
+    pass

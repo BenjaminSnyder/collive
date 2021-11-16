@@ -45,12 +45,12 @@ def insert_revision(token, doc_id, revision):
     '''inserts a revision(rev[hash] = content) into a document by id'''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
-        return ("Error, no document with id: " + doc_id)
+        return ("Error, no document with id: " + str(doc_id))
 
     Rev = Query()
     if(doc.contains(Rev["revision_hash"] == revision["revision_hash"])):
-        return ("Error: Document" + doc_id + "<" +
-                revision["revision_hash"] + "> already exists.")
+        return ("Error: Document" + str(doc_id) + "<" +
+                str(revision["revision_hash"]) + "> already exists.")
     else:
         doc.insert(r_pack(revision))
 
@@ -59,7 +59,7 @@ def get_revision(token, doc_id, revision_hash):
     '''returns a document revision by hash '''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
-        return ("Error, no document with id: " + doc_id)
+        return ("Error, no document with id: " + str(doc_id))
 
     Rev = Query()
     try:
@@ -67,7 +67,7 @@ def get_revision(token, doc_id, revision_hash):
         return unpack(revision)
 
     except IndexError:
-        return ("Error: No revision with hash:" + revision_hash)
+        return ("Error: No revision with hash:" + str(revision_hash))
 
 
 def update_meta(token, doc_id, meta):
