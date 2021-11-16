@@ -12,6 +12,7 @@ app.config.from_mapping(SECRET_KEY='dev')
 # All methods assume Bearer token is in Authorization http header.
 # Database of document is determined by access token
 
+
 @app.route('/document/get')
 @authenticate
 def get_doc():
