@@ -3,11 +3,8 @@ from flask import Flask, request, Response, session, jsonify
 
 from documents.document import Document
 
-from authentication.auth import AuthError, requires_auth
+from authentication.auth import authenticate
 
-AUTH0_DOMAIN = 'dev-47fkm009.us.auth0.com'
-API_AUDIENCE = 'https://collive/api'
-ALGORITHMS = ["RS256"]
 
 app = Flask(__name__)
 app.config.from_mapping(SECRET_KEY='dev')
@@ -16,9 +13,8 @@ app.config.from_mapping(SECRET_KEY='dev')
 # All methods assume Bearer token is in Authorization http header.
 # Database of document is determined by access token
 
-
 @app.route('/document/get')
-@requires_auth
+@authenticate
 def get_doc():
     '''Returns the most recently updated document given doc_id and client_id in url parameters'''
     access_token = request.headers.get('Authorization')
@@ -30,7 +26,7 @@ def get_doc():
 
 
 @app.route('/document/update', methods=['POST'])
-@requires_auth
+@authenticate
 def update_doc():
     '''Updates document given doc_id and document content. Returns the status message'''
     access_token = request.headers.get('Authorization')
@@ -44,8 +40,8 @@ def update_doc():
 
 
 @app.route('/document/create', methods=['POST'])
-@requires_auth
-def create_doc():
+@authenticate
+async def create_doc():
     '''Creates a document for a client, returns status message'''
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
@@ -58,8 +54,8 @@ def create_doc():
 
 
 @app.route('/document/delete', methods=['POST'])
-@requires_auth
-def delete_doc():
+@authenticate
+async def delete_doc():
     '''Deletes a document given doc_id and client_id'''
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
@@ -72,14 +68,6 @@ def delete_doc():
 
 
 @app.route('/client/add', methods=['POST'])
-@requires_auth
-def add_client():
+@authenticate
+async def add_client():
     pass
-
-
-@app.errorhandler(AuthError)
-@requires_auth
-def handle_auth_error(ex):
-    response = jsonify(ex.error)
-    response.status_code = ex.status_code
-    return response

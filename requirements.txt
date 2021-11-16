@@ -1,11 +1,7 @@
 flask
-python-dotenv
-python-jose
-flask-cors
-six
 diff_match_patch
 pylint
-pychecker
+flake8
 pytest
 pytest-cov
 tinydb
