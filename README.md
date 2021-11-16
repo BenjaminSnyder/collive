@@ -12,7 +12,7 @@ https://drive.google.com/drive/folders/16GBnaf75uVPqliTXlQpbPQWAQkqMvayV?usp=sha
 
 API Entry Points
 
-*All entry points except 'user/create' expect a Bearer access token in the HTTP Authorization header
+*All entry points except 'token/create' expect a Bearer access token in the HTTP Authorization header
 
 GET /document/get
 - Expects url parameters doc_id and client_id

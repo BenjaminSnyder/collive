@@ -1,5 +1,5 @@
 from os import name
-from flask import Flask, request, Response, session, jsonify
+from flask import Flask, request, jsonify
 
 from documents.document import Document
 
@@ -46,15 +46,14 @@ def update_doc():
 @app.route('/document/create', methods=['POST'])
 @requires_auth
 def create_doc():
-    '''Creates a document for a client, returns status message'''
+    '''Creates a document for a client, returns doc_id'''
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
 
     doc = Document(access_token)
-    doc.load_document(input['doc_id'], input['client_id'])
 
-    msg = doc.createDocument(input['client_id'])
-    return msg
+    doc_id = doc.createDocument(input['client_id'])
+    return doc_id
 
 
 @app.route('/document/delete', methods=['POST'])
@@ -69,6 +68,12 @@ def delete_doc():
 
     msg = doc.deleteDocument(input['doc_id'])
     return msg
+
+
+@app.route('/token/create')
+def create_token():
+    '''Generates a database and returns the access_token'''
+    pass
 
 
 @app.route('/client/add', methods=['POST'])
