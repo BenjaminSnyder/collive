@@ -1,17 +1,16 @@
 import diff_match_patch as dmp_module
 import requests
 
-from documents.document import Document
 
 global hashify_url
-hashify_url = 'api.hashify.net/hash/md5/'
+hashify_url = 'http://api.hashify.net/hash/md5/hex'
 
 
 # handles creating diffs and giving the hashes
-class document_util:
+class Document_Util:
 
     @staticmethod
-    def update_document(document: Document, doc_id: str,
+    def update_document(document, doc_id: str,
                         local_revision_hash: str, content: str) -> str:
         '''
         Given a document_id, local document hash, and new content
