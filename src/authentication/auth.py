@@ -1,4 +1,4 @@
-from flask import Flask, Response, request
+from flask import Response, request
 from functools import wraps
 
 TOKENS = ['f2dOqweIWy65QWlwiw', 'a1wreoijWeR20lsdwq']
