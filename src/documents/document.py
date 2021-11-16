@@ -31,7 +31,7 @@ class Document():
         else:
             return dict.fromkeys(doc, None)
 
-    def get_most_recent_revision(self, doc_id: str, hash: str) -> str:
+    def get_most_recent_revision(self) -> str:
         '''returns the current content'''
         return self.content
 
