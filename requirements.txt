@@ -8,4 +8,5 @@ pylint
 pychecker
 pytest
 pytest-cov
+pytest-srcpaths
 tinydb
