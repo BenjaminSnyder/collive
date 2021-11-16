@@ -12,6 +12,7 @@ Team Pyoneers
 Shared drive folder:
 https://drive.google.com/drive/folders/16GBnaf75uVPqliTXlQpbPQWAQkqMvayV?usp=sharing
 
+Run the service with $$ python3 src/app.py $$
 
 API Entry Points
 
