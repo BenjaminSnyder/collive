@@ -2,7 +2,6 @@ from os import name
 from flask import Flask, request, Response, session, jsonify
 
 from documents.document import Document
-from authentication.auth import Auth  # is this a class?
 
 from authentication.auth import AuthError, requires_auth
 
@@ -17,14 +16,11 @@ app.config.from_mapping(SECRET_KEY='dev')
 # All methods assume Bearer token is in Authorization http header.
 # Database of document is determined by access token
 
-# Returns the most recently updated document given doc_id
-# and client_id in url parameters.
-# Returns an error message if client does not have access to document.
-
 
 @app.route('/document/get')
 @requires_auth
 def get_doc():
+    '''Returns the most recently updated document given doc_id and client_id in url parameters'''
     access_token = request.headers.get('Authorization')
     doc_id = request.args.get('doc_id')
     client_id = request.args.get('client_id')
@@ -32,12 +28,11 @@ def get_doc():
     doc = Document(access_token)
     return jsonify(doc.loadDocument(doc_id, client_id))
 
-# Updates document given doc_id and document content. Returns the status message.
-
 
 @app.route('/document/update', methods=['POST'])
 @requires_auth
 def update_doc():
+    '''Updates document given doc_id and document content. Returns the status message'''
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
 
@@ -47,12 +42,11 @@ def update_doc():
     msg = doc.updateContent(input['content'], input['client_id'])
     return msg
 
-# Creates a document for a client, returns status message.
-
 
 @app.route('/document/create', methods=['POST'])
 @requires_auth
 def create_doc():
+    '''Creates a document for a client, returns status message'''
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
 
@@ -62,12 +56,11 @@ def create_doc():
     msg = doc.createDocument(input['client_id'])
     return msg
 
-# Deletes a document given doc_id and client_id.
-
 
 @app.route('/document/delete', methods=['POST'])
 @requires_auth
 def delete_doc():
+    '''Deletes a document given doc_id and client_id'''
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
 
