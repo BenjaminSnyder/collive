@@ -1,6 +1,7 @@
 from database.db import Database
-import queue
+from queue import Queue
 from documents.diff import doc_util
+
 
 class Document():
     '''
