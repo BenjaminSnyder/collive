@@ -8,11 +8,11 @@ hashify_url = 'api.hashify.net/hash/md5/'
 
 
 # handles creating diffs and giving the hashes
-class doc_util:
+class document_util:
 
     @staticmethod
     def update_document(db: Database, doc_id: str,
-                        local_revision_hash: str, content: str) -> None:
+                        local_revision_hash: str, content: str) -> str:
         '''
         Given a document_id, local document hash, and new content
         it updates the document with the changes from their local revision
@@ -46,9 +46,7 @@ class doc_util:
         # to the current revision
         # @TODO: Handle weird behavior with unapplied patches
         updated_text, results = dmp.patch_apply(patches, current_revision)
-
-        # Update document in database
-        '''db.update_document()'''
+        return updated_text
 
     @staticmethod
     def create_hash(content: str) -> str:

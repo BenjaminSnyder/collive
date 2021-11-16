@@ -37,7 +37,7 @@ class Document():
             if result is not None:
                 return result
         return "SUCCESS"
-    
+
     def update_meta(self, name, users, viewers, client_id):
         if self.document_id is None:
             return "ERROR: Document not loaded."
@@ -47,7 +47,8 @@ class Document():
             self.users = users
             self.viewers = viewers
             self.revision = create_hash(content)
-            result = Database.insert_meta(self.token, self.__convert_to_dict()[0])
+            result = Database.insert_meta(self.token,
+                                          self.__convert_to_dict()[0])
             if result is not None:
                 return result
         return "SUCCESS"
