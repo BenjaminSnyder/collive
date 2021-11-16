@@ -1,5 +1,5 @@
 import database.db as db
-import queue
+#import queue
 from documents.document_util import document_util
 
 
@@ -32,7 +32,16 @@ class Document():
             return dict.fromkeys(doc, None)
 
     def get_most_recent_revision(self, doc_id: str, hash: str) -> str:
+        '''returns the current content'''
         return self.content
+
+    def get_revision_by_hash(self, document_id: str, hash: str) -> str:
+        '''
+        returns a specified revision given
+        a document_id and a specific hash
+        '''
+        return self.__dict_to_attributes(
+            db.get_revision(self.token, document_id, hash))
 
     def delete_document(self, client_id):
         '''
@@ -62,7 +71,10 @@ class Document():
             return "ERROR: Document not loaded."
 
         if self.__authorize_client(client_id, "u"):
-            self.content = document_util.update_document(self.document_id, self.content, content)
+            self.content = document_util.update_document(self,
+                                                         self.document_id,
+                                                         self.content,
+                                                         content)
             self.content = content
             self.revision = document_util.create_hash(content)
             result = db.insert_content(
@@ -71,13 +83,13 @@ class Document():
             if result is not None:
                 return result
         return "SUCCESS"
-    
+
     def update_meta(self, name, users, viewers, client_id):
         '''
         Update the meta data of the document stored
         in the database with a client's meta data.
         '''
-        
+
         if self.document_id is None:
             return "ERROR: Document not loaded."
 
@@ -94,7 +106,10 @@ class Document():
         pass
 
     def create_document(self, name, client_id):
-        '''Creates a new document with a given name in the document database.'''
+        '''
+        Creates a new document with a given
+        name in the document database.
+        '''
         self.name = name
         self.revision = document_util.create_hash("")
         self.users = [client_id]
@@ -137,4 +152,3 @@ class Document():
     revision = None
     users = None
     viewers = None
-
