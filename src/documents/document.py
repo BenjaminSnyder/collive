@@ -24,12 +24,14 @@ class Document():
         '''
 
         meta = db.get_meta(self.token, document_id)
+        if type(meta) == str:
+            return meta
         doc = db.get_revision(self.token, document_id, meta["curr_revision"])
-        if type(doc) != dict:
+        if type(doc) == str:
             return doc
-        if self.__authorize_client(doc, client_id, 'v'):
-            self.__dict_to_attributes(doc)
-            return doc
+        self.__dict_to_attributes(meta, doc)
+        if self.__authorize_client(client_id, 'v'):
+            return [meta,doc]
         else:
             return dict.fromkeys(doc, None)
 
@@ -76,13 +78,14 @@ class Document():
                                                          self.document_id,
                                                          self.content,
                                                          content)
-            self.content = content
-            self.revision = Document_Util.create_hash(content)
-            result = db.insert_content(
-                self.token,
+            self.revision_hash = Document_Util.create_hash(self.content)
+            result = db.insert_revision(
+                self.token, self.document_id,
                 self.__convert_to_dict()[1])
             if result is not None:
                 return result
+        else:
+            return "ERROR: Client does not have user access."
         return "SUCCESS"
 
     def update_meta(self, name, users, viewers, client_id):
@@ -109,9 +112,10 @@ class Document():
         name in the document database.
         '''
         self.name = name
-        self.revision = Document_Util.create_hash("")
+        self.revision_hash = Document_Util.create_hash("")
         self.users = [client_id]
         self.viewers = [client_id]
+        self.content = ""
         document_id = db.create_document(
             self.token,
             self.__convert_to_dict()[0], self.__convert_to_dict()[1])
@@ -122,33 +126,33 @@ class Document():
 
     def __authorize_client(self, client_id, mode):
         if mode == "u":
-            return client_id in self.users
+            return (client_id in self.users)
         elif mode == "v":
-            return client_id in self.viewers
+            return (client_id in self.viewers)
         return False
 
     def __convert_to_dict(self):
         '''Private method to convert class attributes to a dict'''
         return [{'document_id': self.document_id,
-                'curr_revision': self.revision,
+                'curr_revision': self.revision_hash,
                 'name': self.name,
                 'users': self.users,
                 "viewers": self.viewers}, {'content': self.content,
-                                           'revision': self.revision}]
+                                           'revision_hash': self.revision_hash}]
 
     def __dict_to_attributes(self, meta, doc):
         '''Private method to convert a dict to class attributes'''
         self.document_id = meta["document_id"]
         self.name = meta["name"]
         self.content = doc["content"]
-        self.revision = doc["revision"]
+        self.revision_hash = doc["revision_hash"]
         self.users = meta["users"]
         self.viewers = meta["viewers"]
 
     document_id = None
     name = None
     content = None
-    revision = None
+    revision_hash = None
     users = None
     viewers = None
     token = None
