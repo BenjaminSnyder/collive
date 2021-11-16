@@ -1,14 +1,21 @@
 from database.db import Database
-import doc_utils
 import queue
-from documents.diff import create_hash
+from documents.diff import doc_util
 
 class Document():
+    '''Intermediate class for operations between the server actions and the database operations.'''
+
     def __init__(self, token):
+        '''Initialize a Document with a developer API token that dictates which database the Document will
+        connect to.
+        '''
+
         self.token = token
 
     def load_document(self, document_id, client_id):
-        doc = self.database.get_document(document_id)
+        '''Return a dictionary containing the document information retrieved from the database.'''
+
+        doc = Database.get_document(self.token, document_id)
         if self.__authorize_client(doc, client_id, 'v'):
             self.__dict_to_attributes(doc)
             return doc
@@ -16,10 +23,12 @@ class Document():
             return dict.fromkeys(doc, None)
 
     def delete_document(self, client_id):
+        '''Delete this document from the database if the given client is authenticated.'''
+
         if self.document_id is None:
             return "ERROR: Document not loaded."
         if self.__authorize_client(client_id, "u"):
-            result = Database.delete_document(token, self.__convert_to_dict())
+            result = Database.delete_document(self.token, self.__convert_to_dict())
             if result is not None:
                 return result
         else:
@@ -27,18 +36,22 @@ class Document():
         return "SUCCESS"
 
     def update_content(self, content, client_id):
+        '''Update the contents of the document stored in the database with a client's contents.'''
+
         if self.document_id is None:
             return "ERROR: Document not loaded."
 
         if self.__authorize_client(client_id, "u"):
             self.content = content
-            self.revision = create_hash(content)
+            self.revision = doc_util.create_hash(content)
             result = Database.insert_content(self.token, self.__convert_to_dict()[1])
             if result is not None:
                 return result
         return "SUCCESS"
     
     def update_meta(self, name, users, viewers, client_id):
+        '''Update the meta data of the document stored in the database with a client's meta data.'''
+        
         if self.document_id is None:
             return "ERROR: Document not loaded."
 
@@ -46,7 +59,6 @@ class Document():
             self.name = name
             self.users = users
             self.viewers = viewers
-            self.revision = create_hash(content)
             result = Database.insert_meta(self.token, self.__convert_to_dict()[0])
             if result is not None:
                 return result
@@ -56,7 +68,8 @@ class Document():
         pass
 
     def create_document(self, name, client_id):
-        self.revision = create_hash("")
+        self.revision = doc_util.create_hash("")
+        self.users = [client_id]
         dictionary = self.database.create_document(self.token, self.__convert_to_dict())
         if dictionary["document_id"] is None:
             return "ERROR: Could not create new document."
