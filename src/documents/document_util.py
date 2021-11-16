@@ -1,7 +1,7 @@
-import diff_match_patch as dmp_module # python3.9 -m pip install diff_match_patch
+import diff_match_patch as dmp_module
 import requests
 
-from database.db import Database
+from documents.document import Document
 
 global hashify_url
 hashify_url = 'api.hashify.net/hash/md5/'
@@ -11,7 +11,7 @@ hashify_url = 'api.hashify.net/hash/md5/'
 class document_util:
 
     @staticmethod
-    def update_document(db: Database, doc_id: str,
+    def update_document(document: Document, doc_id: str,
                         local_revision_hash: str, content: str) -> str:
         '''
         Given a document_id, local document hash, and new content
@@ -19,9 +19,8 @@ class document_util:
         '''
 
         # Make some call to the database to get the content based on the hash
-        '''
-        old_content = document.get_revision(doc_id, local_revision_hash)
-        '''
+        old_content = document.get_revision_by_hash(
+            doc_id, local_revision_hash)
 
         # Create diff_match_patch object
         dmp = dmp_module.diff_match_patch()

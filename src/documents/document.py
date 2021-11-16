@@ -1,5 +1,5 @@
 import database.db as db
-#import queue
+# import queue
 from documents.document_util import document_util
 
 
@@ -53,8 +53,8 @@ class Document():
             return "ERROR: Document not loaded."
         if self.__authorize_client(client_id, "u"):
             result = db.delete_document(
-                                        self.token,
-                                        self.__convert_to_dict())
+                self.token,
+                self.__convert_to_dict())
             if result is not None:
                 return result
         else:
@@ -78,8 +78,8 @@ class Document():
             self.content = content
             self.revision = document_util.create_hash(content)
             result = db.insert_content(
-                                    self.token,
-                                    self.__convert_to_dict()[1])
+                self.token,
+                self.__convert_to_dict()[1])
             if result is not None:
                 return result
         return "SUCCESS"
@@ -113,9 +113,10 @@ class Document():
         self.name = name
         self.revision = document_util.create_hash("")
         self.users = [client_id]
+        self.viewers = [client_id]
         dictionary = db.create_document(
-                                            self.token,
-                                            self.__convert_to_dict())
+            self.token,
+            self.__convert_to_dict())
         if dictionary["document_id"] is None:
             return "ERROR: Could not create new document."
         self.__dict_to_attributes(dictionary)
@@ -152,3 +153,5 @@ class Document():
     revision = None
     users = None
     viewers = None
+    token = None
+

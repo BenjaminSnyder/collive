@@ -13,12 +13,15 @@ ALGORITHMS = ["RS256"]
 app = Flask(__name__)
 app.config.from_mapping(SECRET_KEY='dev')
 
-# API access token authentication happens before each method. 
+# API access token authentication happens before each method.
 # All methods assume Bearer token is in Authorization http header.
 # Database of document is determined by access token
 
-# Returns the most recently updated document given doc_id and client_id in url parameters. 
+# Returns the most recently updated document given doc_id
+# and client_id in url parameters.
 # Returns an error message if client does not have access to document.
+
+
 @app.route('/document/get')
 @requires_auth
 def get_doc():
@@ -30,6 +33,8 @@ def get_doc():
     return jsonify(doc.loadDocument(doc_id, client_id))
 
 # Updates document given doc_id and document content. Returns the status message.
+
+
 @app.route('/document/update', methods=['POST'])
 @requires_auth
 def update_doc():
@@ -42,7 +47,9 @@ def update_doc():
     msg = doc.updateContent(input['content'], input['client_id'])
     return msg
 
-# Creates a document for a client, returns status message. 
+# Creates a document for a client, returns status message.
+
+
 @app.route('/document/create', methods=['POST'])
 @requires_auth
 def create_doc():
@@ -55,7 +62,9 @@ def create_doc():
     msg = doc.createDocument(input['client_id'])
     return msg
 
-# Deletes a document given doc_id and client_id. 
+# Deletes a document given doc_id and client_id.
+
+
 @app.route('/document/delete', methods=['POST'])
 @requires_auth
 def delete_doc():
@@ -68,10 +77,12 @@ def delete_doc():
     msg = doc.deleteDocument(input['doc_id'])
     return msg
 
+
 @app.route('/client/add', methods=['POST'])
 @requires_auth
 def add_client():
     pass
+
 
 @app.errorhandler(AuthError)
 @requires_auth

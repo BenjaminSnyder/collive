@@ -18,17 +18,8 @@ def unpack(data):
 
 def open_database(token) -> TinyDB:
     '''opens a database connection'''
-    userdb = TinyDB('users.json')
-    User = Query()
-    link = userdb.search(User.tokens.any([token]))
-    try:
-        db = TinyDB(link[0]["database"] + '.json')
-        userdb.close()
-        return db
-
-    except IndexError:
-        userdb.close()
-        return ("Error: token not associated with database")
+    db = TinyDB(token + ".json")
+    return db
 
 
 def open_document(token, doc_id):
