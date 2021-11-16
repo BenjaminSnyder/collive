@@ -1,21 +1,21 @@
 import diff_match_patch as dmp_module
 import requests
 
-from documents.document import Document
 
 global hashify_url
-hashify_url = 'api.hashify.net/hash/md5/'
+hashify_url = 'http://api.hashify.net/hash/md5/hex'
 
 
 # handles creating diffs and giving the hashes
-class document_util:
+class Document_Util:
 
     @staticmethod
-    def update_document(document: Document, doc_id: str,
+    def update_document(document, doc_id: str,
                         local_revision_hash: str, content: str) -> str:
         '''
         Given a document_id, local document hash, and new content
-        it updates the document with the changes from their local revision
+        it creates the updated document with the changes from their
+        local revision
         '''
 
         # Make some call to the database to get the content based on the hash
@@ -28,18 +28,10 @@ class document_util:
         # set max diff calculate time to 100 milliseconds
         dmp.Diff_Timeout = 0.1
 
-        # Use this revision to create a diff between
-        # their local content and their old local content
         diff = dmp.diff_main(old_content, content)
-
-        # Clean up diff to make it more human readable
         dmp.diff_cleanupSemantic(diff)
-
-        # Create list of patches based on the diff
         patches = dmp.patch_make(diff)
-
-        # Get the most recent revision for a document
-        current_revision = document.get_most_recent_revision(doc_id)
+        current_revision = document.get_most_recent_revision()
 
         # Apply this patch (changes from their version to new content)
         # to the current revision
