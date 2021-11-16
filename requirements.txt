@@ -3,3 +3,4 @@ python-dotenv
 python-jose
 flask-cors
 six
+diff_match_patch
