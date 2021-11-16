@@ -1,6 +1,7 @@
 from database.db import Database
 import doc_utils
 import queue
+from documents.diff import create_hash
 
 class Document():
     def __init__(self, token):
