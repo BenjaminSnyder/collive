@@ -62,7 +62,7 @@ class Document():
             return "ERROR: Document not loaded."
 
         if self.__authorize_client(client_id, "u"):
-            self.content = document_util.update_document(self.document_id, self.content, content)
+            self.content = document_util.update_document(self)
             self.content = content
             self.revision = document_util.create_hash(content)
             result = db.insert_content(
@@ -98,6 +98,7 @@ class Document():
         self.name = name
         self.revision = document_util.create_hash("")
         self.users = [client_id]
+        self.viewers = [client_id]
         dictionary = db.create_document(
                                             self.token,
                                             self.__convert_to_dict())
@@ -137,4 +138,5 @@ class Document():
     revision = None
     users = None
     viewers = None
+    token = None
 
