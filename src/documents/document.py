@@ -1,10 +1,10 @@
 from database.db import Database
-import docUtils
+import doc_utils
 import queue
 
 class Document():
     def __init__(self, token):
-        self.database = Database(token)
+        self.token = token
 
     def load_document(self, document_id, client_id):
         doc = self.database.get_document(document_id)
@@ -18,22 +18,35 @@ class Document():
         if self.document_id is None:
             return "ERROR: Document not loaded."
         if self.__authorize_client(client_id, "u"):
-            result = self.database.delete_document(self.__convert_to_dict())
+            result = Database.delete_document(token, self.__convert_to_dict())
             if result is not None:
                 return result
         else:
             return "ERROR: Client does not have user access."
         return "SUCCESS"
 
-    def update_content(self, name, content, client_id):
+    def update_content(self, content, client_id):
+        if self.document_id is None:
+            return "ERROR: Document not loaded."
+
+        if self.__authorize_client(client_id, "u"):
+            self.content = content
+            self.revision = create_hash(content)
+            result = Database.insert_content(self.token, self.__convert_to_dict()[1])
+            if result is not None:
+                return result
+        return "SUCCESS"
+    
+    def update_meta(self, name, users, viewers, client_id):
         if self.document_id is None:
             return "ERROR: Document not loaded."
 
         if self.__authorize_client(client_id, "u"):
             self.name = name
-            self.content = content
+            self.users = users
+            self.viewers = viewers
             self.revision = create_hash(content)
-            result = self.database.insert_document(self.__convert_to_dict())
+            result = Database.insert_meta(self.token, self.__convert_to_dict()[0])
             if result is not None:
                 return result
         return "SUCCESS"
@@ -43,7 +56,7 @@ class Document():
 
     def create_document(self, name, client_id):
         self.revision = create_hash("")
-        dictionary = self.database.create_document(self.__convert_to_dict())
+        dictionary = self.database.create_document(self.token, self.__convert_to_dict())
         if dictionary["document_id"] is None:
             return "ERROR: Could not create new document."
         self.__dict_to_attributes(dictionary)
