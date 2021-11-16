@@ -1,52 +1,80 @@
 from database.db import Database
-
+import docUtils
+import queue
 
 class Document():
-    def __init__(self, user_id):
-        self.database = Database(user_id)
+    def __init__(self, token):
+        self.database = Database(token)
 
-    def load_document(self, document_id):
-        dictionary = self.database.get_document(document_id)
-        self.__dict_to_attributes(dictionary)
-        return dictionary
+    def load_document(self, document_id, client_id):
+        doc = self.database.get_document(document_id)
+        if self.__authorize_client(doc, client_id, 'v'):
+            self.__dict_to_attributes(doc)
+            return doc
+        else:
+            return dict.fromkeys(doc, None)
 
-    def delete_document(self, document_id):
-        self.document_id = document_id
-        dictionary = self.database.delete_document(self.__convert_to_dict())
-        if dictionary["document_id"] is not None:
-            return "ERROR: Document not deleted."
-        return "SUCCESS"
-
-    def update_content(self, content):
+    def delete_document(self, client_id):
         if self.document_id is None:
-            return "ERROR: Document not Loaded."
-        self.revision += 1
-        self.content = content
-        dictionary = self.database.insert(self.__convert_to_dict())
-        if dictionary["content"] is None:
-            return "ERROR: Document Content not updated."
+            return "ERROR: Document not loaded."
+        if self.__authorize_client(client_id, "u"):
+            result = self.database.delete_document(self.__convert_to_dict())
+            if result is not None:
+                return result
+        else:
+            return "ERROR: Client does not have user access."
         return "SUCCESS"
 
-    def create_document(self):
-        self.revision = 0
+    def update_content(self, name, content, client_id):
+        if self.document_id is None:
+            return "ERROR: Document not loaded."
+
+        if self.__authorize_client(client_id, "u"):
+            self.name = name
+            self.content = content
+            self.revision = create_hash(content)
+            result = self.database.insert_document(self.__convert_to_dict())
+            if result is not None:
+                return result
+        return "SUCCESS"
+
+    def get_diff_to_patch(self, content):
+        pass
+
+    def create_document(self, name, client_id):
+        self.revision = create_hash("")
         dictionary = self.database.create_document(self.__convert_to_dict())
         if dictionary["document_id"] is None:
-            return "ERROR: Failed to create document."
+            return "ERROR: Could not create new document."
         self.__dict_to_attributes(dictionary)
         return dictionary["document_id"]
 
+    def __authorize_client(self, client_id, mode):
+        if mode == "u":
+            return client_id in self.users
+        elif mode == "v":
+            return client_id in self.viewers
+        return False
+
     def __convert_to_dict(self):
-        return {'document_id':self.document_id, 'name':self.name, 'content':self.content,
+        return {'document_id':self.document_id, 'curr_revision':self.revision, 'name':self.name, 
+                'users': self.users, "viewers": self.viewers}, {'content':self.content,
                 'revision':self.revision}
 
-    def __dict_to_attributes(self, dictionary):
-        self.document_id = dictionary["document_id"]
-        self.name = dictionary["name"]
-        self.content = dictionary["content"]
-        self.revision = dictionary["revision"]
+    def __dict_to_attributes(self, meta, doc):
+        self.document_id = meta["document_id"]
+        self.name = meta["name"]
+        self.content = doc["content"]
+        self.revision = doc["revision"]
+        self.users = meta["users"]
+        self.viewers = meta["viewers"]
 
     document_id = None
     name = None
     content = None
     database = None
     revision = None
+    users = None
+    revisionHistory = {}
+    viewers = None
+
