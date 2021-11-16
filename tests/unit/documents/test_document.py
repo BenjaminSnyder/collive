@@ -5,7 +5,7 @@ import pytest
 def test_load_document():
     doc = Document("test")
     doc_id = doc.create_document("load_doc.txt", "client")
-    response = doc.update_content("This is a a doc to load", "client")
+    _ = doc.update_content("This is a a doc to load", "client")
     doc = Document("test")
     dictionary = doc.load_document(doc_id, "client")
     assert dictionary["document_id"] == doc_id
@@ -14,13 +14,13 @@ def test_load_document():
     assert dictionary["content"] == "This is a doc to load"
 
     dictionary = doc.load_document("error_doc", "client")
-    assert dictionary == None
-    response = doc.delete_document(doc_id, "client")
+    assert dictionary is None
+    _ = doc.delete_document(doc_id, "client")
 
 
 def test_get_most_recent_revision():
     doc = Document("test")
-    assert doc.get_most_recent_revision() == None
+    assert doc.get_most_recent_revision() is None
     doc.content = "content"
     assert doc.get_most_recent_revision == "content"
 
@@ -44,7 +44,7 @@ def test_delete_document():
     response = doc.delete_document("client")
     assert response == "SUCCESS"
     dictionary = doc.load_document(doc_id, "client")
-    assert dictionary == None
+    assert dictionary is None
     response = doc.delete_document("client")
     assert response == "ERROR: Document does not exist."
 
