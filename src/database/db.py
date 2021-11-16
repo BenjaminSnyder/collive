@@ -59,7 +59,7 @@ def get_revision(token, doc_id, revision_hash):
     '''returns a document revision by hash '''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
-        return ("Error, no document with id: " + doc_id)
+        return ("Error, no document with id: " + str(doc_id))
 
     Rev = Query()
     try:

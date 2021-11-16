@@ -33,7 +33,7 @@ def test_create_insert_and_get():
     db.insert_revision(token, doc_id, rev)
 
     meta = db.get_meta(token, doc_id)
-    rev = db.get_revision(token, doc_id, 3333)
+    rev = db.get_revision(token, doc_id, "3333")
 
     assert meta["document_id"] == doc_id
     assert meta["name"] == "test document 2"
