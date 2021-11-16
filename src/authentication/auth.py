@@ -1,4 +1,5 @@
 import json
+import http.client
 from six.moves.urllib.request import urlopen
 from functools import wraps
 
@@ -17,6 +18,15 @@ class AuthError(Exception):
         self.error = error
         self.status_code = status_code
 
+# Generate Auth0 access token
+def make_access_token():
+    conn = http.client.HTTPSConnection("dev-47fkm009.us.auth0.com")
+    payload = "{\"client_id\":\"lYNhbvJVrqgprj0WwQ6x5SqnTVAHLryJ\",\"client_secret\":\"j_GntBTetolYeu1UXpu3VAgLvbdGmC3AqrtDp3e7ZF-H8i-eIbQTVNoZe3LLksMs\",\"audience\":\"https://collive/api\",\"grant_type\":\"client_credentials\"}"
+    headers = { 'content-type': "application/json" }
+    conn.request("POST", "/oauth/token", payload, headers)
+    res = conn.getresponse()
+    data = res.read()
+    data = data.decode("utf-8")
 
 # Format error response and append status code
 def get_token_auth_header():
