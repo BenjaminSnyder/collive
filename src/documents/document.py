@@ -25,6 +25,8 @@ class Document():
 
         meta = db.get_meta(self.token, document_id)
         doc = db.get_revision(self.token, document_id, meta["cur_revision"])
+        if type(doc) != dict:
+            return doc
         if self.__authorize_client(doc, client_id, 'v'):
             self.__dict_to_attributes(doc)
             return doc
@@ -40,8 +42,7 @@ class Document():
         returns a specified revision given
         a document_id and a specific hash
         '''
-        return self.__dict_to_attributes(
-            db.get_revision(self.token, document_id, hash))
+        return db.get_revision(self.token, document_id, hash)
 
     def delete_document(self, client_id):
         '''
@@ -101,9 +102,6 @@ class Document():
             if result is not None:
                 return result
         return "SUCCESS"
-
-    def get_diff_to_patch(self, content):
-        pass
 
     def create_document(self, name, client_id):
         '''
