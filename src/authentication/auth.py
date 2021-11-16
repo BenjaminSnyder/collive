@@ -2,14 +2,21 @@ import json
 from six.moves.urllib.request import urlopen
 from functools import wraps
 
-from flask import Flask, request, jsonify, _request_ctx_stack
-from flask_cors import cross_origin
+from flask import request, _request_ctx_stack
+# from flask import Flask, jsonify
+# from flask_cors import cross_origin
 from jose import jwt
+
+AUTH0_DOMAIN = 'dev-47fkm009.us.auth0.com'
+API_AUDIENCE = 'https://collive/api'
+ALGORITHMS = ["RS256"]
+
 
 class AuthError(Exception):
     def __init__(self, error, status_code):
         self.error = error
         self.status_code = status_code
+
 
 # Format error response and append status code
 def get_token_auth_header():
@@ -40,13 +47,14 @@ def get_token_auth_header():
     token = parts[1]
     return token
 
+
 def requires_auth(f):
     """Determines if the Access Token is valid
     """
     @wraps(f)
     def decorated(*args, **kwargs):
         token = get_token_auth_header()
-        jsonurl = urlopen("https://"+AUTH0_DOMAIN+"/.well-known/jwks.json")
+        jsonurl = urlopen("https://" + AUTH0_DOMAIN + "/.well-known/jwks.json")
         jwks = json.loads(jsonurl.read())
         unverified_header = jwt.get_unverified_header(token)
         rsa_key = {}
@@ -88,6 +96,7 @@ def requires_auth(f):
                         "description": "Unable to find appropriate key"}, 401)
     return decorated
 
+
 def requires_scope(required_scope):
     """Determines if the required scope is present in the Access Token
     Args:
@@ -96,8 +105,8 @@ def requires_scope(required_scope):
     token = get_token_auth_header()
     unverified_claims = jwt.get_unverified_claims(token)
     if unverified_claims.get("scope"):
-            token_scopes = unverified_claims["scope"].split()
-            for token_scope in token_scopes:
-                if token_scope == required_scope:
-                    return True
+        token_scopes = unverified_claims["scope"].split()
+        for token_scope in token_scopes:
+            if token_scope == required_scope:
+                return True
     return False
