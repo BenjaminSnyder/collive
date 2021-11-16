@@ -14,40 +14,21 @@ ALGORITHMS = ["RS256"]
 app = Flask(__name__)
 app.config.from_mapping(SECRET_KEY='dev')
 
-'''
-# before each request, check if user (API caller/developer) is authenticated
-@app.before_request
-def check_user_login():
-    if 'user_id' not in session:
-        print('Developer not logged in.')
-
-# login the user 
-@app.route('/login', methods=['POST'])
-def login():
-    user = request.get_json(force=True)
-    # auth
-    
-    # if no issues, new session
-    if True:
-        session['user_id'] = user['user_id']
-    return 'Logins successful.'
-'''
-
-@app.route('/document/get/<int:doc_id>')
+@app.route('/document/get')
 @requires_auth
-def get_doc(doc_id):
+def get_doc():
     auth_token = request.headers.get('Authorization')
-    user_id = None # get user_id from auth, using auth_token
-    doc = Document(user_id)
+    doc_id = request.args.get('doc_id')
+    client_id = request.args.get('client_id')
+    doc = Document(auth_token, client_id)
     return jsonify(doc.loadDocument(doc_id))
 
 @app.route('/document/update', methods=['POST'])
 @requires_auth
 def update_doc():
     auth_token = request.headers.get('Authorization')
-    user_id = None # get user_id from auth, using auth_token
     data = request.get_json(force=True)
-    doc = Document(user_id)
+    doc = Document(auth_token)
     msg = doc.updateContent(data['data'])
     return msg
 
@@ -55,8 +36,7 @@ def update_doc():
 @requires_auth
 def create_doc():
     auth_token = request.headers.get('Authorization')
-    user_id = None # get user_id from auth, using auth_token
-    doc = Document(user_id)
+    doc = Document(auth_token)
     msg = doc.createDocument()
     return msg
 
@@ -64,12 +44,11 @@ def create_doc():
 @requires_auth
 def delete_doc(doc_id):
     auth_token = request.headers.get('Authorization')
-    user_id = None # get user_id from auth, using auth_token
-    doc = Document(user_id)
+    doc = Document(auth_token)
     msg = doc.deleteDocument(doc_id)
     return msg
 
-@app.route('/getUser/<int:user_id>')
+@app.route('/getUser/<int:database_id>')
 @requires_auth
 def get_user():
     pass
