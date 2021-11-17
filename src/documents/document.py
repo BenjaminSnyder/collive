@@ -33,7 +33,7 @@ class Document():
         if self.__authorize_client(client_id, 'v'):
             return [meta,doc]
         else:
-            return dict.fromkeys(doc, None)
+            return [dict.fromkeys(meta), dict.fromkeys(doc, None)]
 
     def get_most_recent_revision(self) -> str:
         '''returns the current content'''
