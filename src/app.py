@@ -64,7 +64,7 @@ def delete_doc():
     doc = Document(access_token, input['client_id'])
     doc.load_document(input['doc_id'], input['client_id'])
 
-    msg = doc.deleteDocument(input['doc_id'])
+    msg = doc.delete_document(input['doc_id'])
     return msg
 
 
