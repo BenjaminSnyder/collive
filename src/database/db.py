@@ -50,8 +50,8 @@ def insert_revision(token, doc_id, revision):
 
     Rev = Query()
     if(doc.contains(Rev["revision_hash"] == revision["revision_hash"])):
-        return ("Error: Document" + str(doc_id) + "<" +
-                str(revision["revision_hash"]) + "> already exists.")
+        return (str(doc_id) + "<" +
+                str(revision["revision_hash"]) + "> is identical to the revision. No changes were made.")
     else:
         doc.insert(r_pack(revision))
         meta = get_meta(token, doc_id)
