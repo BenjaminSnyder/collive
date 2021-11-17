@@ -23,6 +23,7 @@ class Document():
         information retrieved from the database.
         '''
 
+        client_id = str(client_id)
         meta = db.get_meta(self.token, document_id)
         if type(meta) == str:
             return meta
@@ -34,7 +35,7 @@ class Document():
         if self.__authorize_client(client_id, 'v'):
             return [meta, doc]
         else:
-            return dict.fromkeys(doc, None)
+            return [dict.fromkeys(meta), dict.fromkeys(doc, None)]
 
     def get_most_recent_revision(self) -> str:
         '''returns the current content'''
@@ -53,6 +54,7 @@ class Document():
         if the given client is authenticated.
         '''
 
+        client_id = str(client_id)
         if self.document_id is None:
             return "ERROR: Document not loaded."
         if self.__authorize_client(client_id, "u"):
@@ -71,6 +73,7 @@ class Document():
         the database with a client's contents.
         '''
 
+        client_id = str(client_id)
         if self.document_id is None:
             return "ERROR: Document not loaded."
 
@@ -95,6 +98,7 @@ class Document():
         in the database with a client's meta data.
         '''
 
+        client_id = str(client_id)
         if self.document_id is None:
             return "ERROR: Document not loaded."
 
@@ -112,6 +116,8 @@ class Document():
         Creates a new document with a given
         name in the document database.
         '''
+
+        client_id = str(client_id)
         self.name = name
         self.revision_hash = Document_Util.create_hash("")
         self.users = [client_id]
