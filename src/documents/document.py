@@ -30,8 +30,9 @@ class Document():
         if type(doc) == str:
             return doc
         self.__dict_to_attributes(meta, doc)
+
         if self.__authorize_client(client_id, 'v'):
-            return [meta,doc]
+            return [meta, doc]
         else:
             return dict.fromkeys(doc, None)
 

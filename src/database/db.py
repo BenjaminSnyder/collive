@@ -38,7 +38,6 @@ def create_document(token, meta, revision):
 
     t.insert(m_pack(meta))
     t.insert(r_pack(revision))
-    print(revision)
     return "" + str(m_id)
 
 
@@ -50,14 +49,11 @@ def insert_revision(token, doc_id, revision):
 
     Rev = Query()
     if(doc.contains(Rev["revision_hash"] == revision["revision_hash"])):
-        return (str(doc_id) + "<" +
-                str(revision["revision_hash"]) + "> is identical to the revision. No changes were made.")
+        return ("Error: Document" + str(doc_id) + "<" +
+                str(revision["revision_hash"]) + "> already exists.")
     else:
         doc.insert(r_pack(revision))
-        meta = get_meta(token, doc_id)
-        meta["curr_revision"] = revision["revision_hash"]
-        print(meta)
-        update_meta(token, doc_id, meta)
+
 
 def get_revision(token, doc_id, revision_hash):
     '''returns a document revision by hash '''

@@ -21,7 +21,7 @@ def get_doc():
     access_token = request.headers.get('Authorization')
     doc_id = request.args.get('doc_id')
     client_id = request.args.get('client_id')
-
+    
     doc = Document(access_token)
     return jsonify(doc.load_document(doc_id, client_id))
 
