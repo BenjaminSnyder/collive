@@ -23,7 +23,7 @@ def get_doc():
     client_id = request.args.get('client_id')
 
     doc = Document(access_token)
-    return jsonify(doc.loadDocument(doc_id, client_id))
+    return jsonify(doc.load_document(doc_id, client_id))
 
 
 @app.route('/document/update', methods=['POST'])
@@ -34,10 +34,10 @@ def update_doc():
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
 
-    doc = Document(access_token, input['client_id'])
+    doc = Document(access_token)
     doc.load_document(input['doc_id'], input['client_id'])
 
-    msg = doc.updateContent(input['content'], input['client_id'])
+    msg = doc.update_content(input['content'], input['client_id'])
     return msg
 
 
@@ -50,7 +50,7 @@ def create_doc():
 
     doc = Document(access_token)
 
-    doc_id = doc.createDocument(input['client_id'])
+    doc_id = doc.create_document(input['name'], input['client_id'])
     return doc_id
 
 
