@@ -8,13 +8,24 @@ def test_load_document():
     _ = doc.update_content("This is a doc to load", "client")
     doc = Document("test")
     dictionaries = doc.load_document(doc_id, "client")
-    print(dictionaries)
     meta = dictionaries[0]
     rev = dictionaries[1]
     assert meta["document_id"] == doc_id
     assert rev["revision_hash"] == doc.revision_hash
     assert meta["name"] == "load_doc.txt"
     assert rev["content"] == "This is a doc to load"
+
+    doc_id = doc.create_document("load_doc2.txt", "client1")
+    doc = Document("test")
+    dictionaries = doc.load_document(doc_id, "client1")
+    meta = dictionaries[0]
+    rev = dictionaries[1]
+    assert meta["document_id"] == doc_id
+    assert rev["revision_hash"] == doc.revision_hash
+    assert meta["name"] == "load_doc2.txt"
+    assert rev["content"] == ""
+    assert meta["viewers"] == ["client1"]
+    assert meta["users"] == ["client1"]
 
     dictionary = doc.load_document("error_doc", "client")
     assert dictionary  == "Error, no document with id: error_doc"
@@ -63,6 +74,7 @@ def test_update_content():
     assert response == "ERROR: Document not loaded."
 
     doc_id = doc.create_document("update_doc.txt", "client")
+    doc = Document("test")
     dictionaries = doc.load_document(doc_id, "client")
     response = doc.update_content("This is a doc to update", "client")
     assert response == "SUCCESS"
