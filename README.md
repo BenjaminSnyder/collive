@@ -15,6 +15,9 @@ https://drive.google.com/drive/folders/16GBnaf75uVPqliTXlQpbPQWAQkqMvayV?usp=sha
 To run the service:
 In the src directory, do $$ export FLASK_APP=app $$. Then do $$ flask run $$. 
 
+To run the test suite and generate coverage report:
+pytest --cov=src tests/
+
 API Entry Points
 
 *All entry points except 'token/create' expect a Bearer access token in the HTTP Authorization header. 
