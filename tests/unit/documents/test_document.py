@@ -28,7 +28,7 @@ def test_load_document():
     assert meta["users"] == ["client1"]
 
     dictionary = doc.load_document("error_doc", "client")
-    assert dictionary  == "Error, no document with id: error_doc"
+    assert dictionary == "Error, no document with id: error_doc"
     _ = doc.delete_document("client")
 
 
@@ -65,8 +65,6 @@ def test_delete_document():
     response = doc.delete_document("client")
     assert response == "SUCCESS"
 
-    
-
 
 def test_update_content():
     doc = Document("test")
@@ -93,7 +91,7 @@ def test_update_content():
     assert doc.document_id == doc_id
     assert doc.revision_hash != revision_hash
     assert doc.content == "This is a doc to update version 2"
-    
+
     response = doc.delete_document("update_doc.txt")
 
 

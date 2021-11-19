@@ -3,8 +3,10 @@ from functools import wraps
 
 TOKENS = ['f2dOqweIWy65QWlwiw', 'a1wreoijWeR20lsdwq']
 
+
 def valid_credentials(token):
     return token in TOKENS
+
 
 def authenticate(f):
     """Determines if the access token is valid:
