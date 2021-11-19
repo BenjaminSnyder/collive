@@ -15,6 +15,11 @@ In the src directory, do $$ export FLASK_APP=app $$. Then do $$ flask run $$.
 To run the test suite and generate coverage report:
 pytest --cov=src tests/
 
+To run style-checking, run:
+flake8 > bugs.txt
+
+The file "bugs.txt" will contain the list of all style and bug errors.
+
 API Entry Points
 
 *All entry points except 'token/create' expect a Bearer access token in the HTTP Authorization header. 
