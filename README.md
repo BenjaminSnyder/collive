@@ -20,6 +20,9 @@ flake8 > bugs.txt
 
 The file "bugs.txt" will contain the list of all style and bug errors.
 
+For system checking:
+The result of the Postman tests can be found in "postman_test_result.json"
+
 API Entry Points
 
 *All entry points except 'token/create' expect a Bearer access token in the HTTP Authorization header. 
