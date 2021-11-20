@@ -21,6 +21,6 @@ def authenticate(f):
         bearer = headers.get('Authorization')
         token = bearer.split()[1]
         if not token or not valid_credentials(token):
-            return Response('Invalid token', 401)
+            return Response('ERROR: Invalid API access token', 401)
         return f(*args, **kwargs)
     return wrapper

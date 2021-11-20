@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify
 
 from documents.document import Document
 
@@ -23,12 +23,17 @@ def get_doc():
     client_id = request.args.get('client_id')
 
     if not doc_id:
-        return "doc_id not specified", 400
+        return "ERROR: doc_id parameter missing", 400
     elif not client_id:
-        return "client_id not specified", 400
+        return "ERROR: client_id parameter missing", 400
 
     doc = Document(access_token)
-    return jsonify(doc.load_document(doc_id, client_id))
+    out = doc.load_document(doc_id, client_id)
+    if type(out) == str:
+        return out, 400
+    elif out[1]['content'] is None:
+        return f"ERROR: client does not have access to doc_id {doc_id}", 400
+    return jsonify(out)
 
 
 @app.route('/document/update', methods=['POST'])
@@ -62,7 +67,7 @@ def create_doc():
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
 
-    err = check_input(['client_id'], input)
+    err = check_input(['client_id', 'name'], input)
     if err is not None:
         return err, 400
 
@@ -111,6 +116,6 @@ def check_input(keys: list, dict: dict):
             elif type(val) != str:
                 return f"ERROR: {key} must be of type string"
         except KeyError:
-            return f"ERROR: {key} parameter needed"
+            return f"ERROR: {key} parameter missing"
 
     return None
