@@ -26,7 +26,7 @@ def get_doc():
         return "doc_id not specified", 400
     elif not client_id:
         return "client_id not specified", 400
-    
+
     doc = Document(access_token)
     return jsonify(doc.load_document(doc_id, client_id))
 

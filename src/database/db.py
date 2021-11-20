@@ -49,14 +49,9 @@ def insert_revision(token, doc_id, revision):
 
     Rev = Query()
     if(doc.contains(Rev["revision_hash"] == revision["revision_hash"])):
-<<<<<<< HEAD
-        return ("Error: Document" + str(doc_id) + "<" +
-                str(revision["revision_hash"]) + "> already exists.")
-=======
         return (str(doc_id) + "<" +
                 str(revision["revision_hash"]) +
                 "> is identical to the revision. No changes were made.")
->>>>>>> 89a25f23a91b2c5b3513ca88c0bbb2388ce6855c
     else:
         doc.insert(r_pack(revision))
 
