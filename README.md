@@ -23,35 +23,6 @@ The file "bugs.txt" will contain the list of all style and bug errors.
 For system checking:
 The result of the Postman tests can be found in "postman_test_result.json"
 
-API Entry Points
+API Entry Points:
 
-*All entry points except 'token/create' expect a Bearer access token in the HTTP Authorization header. 
-This bearer token is authenticated and then used to determine which database to query from. I.e. each 
-
-GET /document/get
-- Expects url parameters doc_id and client_id
-- Returns most recently updated document given these parameters
-
-POST /document/update
-- Expects json input with client_id and doc_id
-- Updates document in database
-- Returns status message
-
-POST /document/create
-- Expects json input with client_id
-- Creates new document in database
-- Returns doc_id
-
-POST /document/delete
-- Expects json input with client_id and doc_id
-- Deletes document from database
-- Returns status message
-
-GET /token/create
-- Generates a database 
-- Returns the access token
-
-Order of operation:
-- /token/create must be run before /document/create. 
-- /document/create must be run before any other operation listed above. 
-- Exception: there already exists a token and/or document_id (i.e. that was manually entered into the db)
+Refer to 'index.html' for documentation on all entry points in the API.
