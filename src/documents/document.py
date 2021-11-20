@@ -106,7 +106,8 @@ class Document():
             self.name = name
             self.users = users
             self.viewers = viewers
-            result = db.update_meta(self.token, self.document_id, self.__convert_to_dict()[0])
+            result = db.update_meta(self.token, self.document_id,
+                                    self.__convert_to_dict()[0])
             if result is not None:
                 return result
         return "SUCCESS"
@@ -142,10 +143,11 @@ class Document():
         '''Private method to convert class attributes to a dict'''
         return [{'document_id': self.document_id,
                 'curr_revision': self.revision_hash,
-                'name': self.name,
-                'users': self.users,
-                "viewers": self.viewers}, {'content': self.content,
-                                           'revision_hash': self.revision_hash}]
+                 'name': self.name,
+                 'users': self.users,
+                 'viewers': self.viewers},
+                {'content': self.content,
+                 'revision_hash': self.revision_hash}]
 
     def __dict_to_attributes(self, meta, doc):
         '''Private method to convert a dict to class attributes'''

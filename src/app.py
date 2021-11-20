@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 
 from documents.document import Document
 
@@ -21,6 +21,11 @@ def get_doc():
     access_token = request.headers.get('Authorization')
     doc_id = request.args.get('doc_id')
     client_id = request.args.get('client_id')
+
+    if not doc_id:
+        return "doc_id not specified", 400
+    elif not client_id:
+        return "client_id not specified", 400
     
     doc = Document(access_token)
     return jsonify(doc.load_document(doc_id, client_id))
@@ -33,6 +38,10 @@ def update_doc():
      content. Returns the status message'''
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
+
+    err = check_input(['doc_id', 'client_id'], input)
+    if err is not None:
+        return err, 400
 
     doc = Document(access_token)
     doc.load_document(input['doc_id'], input['client_id'])
@@ -48,6 +57,10 @@ def create_doc():
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
 
+    err = check_input(['client_id'], input)
+    if err is not None:
+        return err, 400
+
     doc = Document(access_token)
 
     doc_id = doc.create_document(input['name'], input['client_id'])
@@ -60,6 +73,10 @@ def delete_doc():
     '''Deletes a document given doc_id and client_id'''
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
+
+    err = check_input(['doc_id', 'client_id'], input)
+    if err is not None:
+        return err, 400
 
     doc = Document(access_token, input['client_id'])
     doc.load_document(input['doc_id'], input['client_id'])
@@ -78,3 +95,17 @@ def create_token():
 @authenticate
 def add_client():
     pass
+
+
+def check_input(keys: list, dict: dict):
+    for key in keys:
+        try:
+            val = dict[key]
+            if not val:
+                return f"ERROR: {key} invalid input"
+            elif type(val) != str:
+                return f"ERROR: {key} must be of type string"
+        except KeyError:
+            return f"ERROR: {key} parameter needed"
+
+    return None

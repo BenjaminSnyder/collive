@@ -3,11 +3,17 @@ from functools import wraps
 
 TOKENS = ['f2dOqweIWy65QWlwiw', 'a1wreoijWeR20lsdwq']
 
+
 def valid_credentials(token):
+    '''
+    Given a token, verifies if the token is valid
+    '''
     return token in TOKENS
 
+
 def authenticate(f):
-    """Determines if the access token is valid:
+    """
+    Grabs token from request header and validates it
     """
     @wraps(f)
     def wrapper(*args, **kwargs):
