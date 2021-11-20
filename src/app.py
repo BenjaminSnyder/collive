@@ -43,8 +43,13 @@ def update_doc():
     if err is not None:
         return err, 400
 
+    if 'content' not in input:
+        return 'ERROR: content parameter needed', 400
+
     doc = Document(access_token)
-    doc.load_document(input['doc_id'], input['client_id'])
+    msg = doc.load_document(input['doc_id'], input['client_id'])
+    if type(msg) == str:
+        return msg, 400
 
     msg = doc.update_content(input['content'], input['client_id'])
     return msg
