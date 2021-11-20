@@ -26,6 +26,3 @@ The result of the Postman tests can be found in "postman_test_result.json"
 API Entry Points:
 
 Refer to 'index.html' for documentation on all entry points in the API.
-
-![Alt text](./index.svg)
-<img src="./index.svg">
