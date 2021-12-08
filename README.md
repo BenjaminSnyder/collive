@@ -1,3 +1,5 @@
+[![Python Build](https://github.com/BenjaminSnyder/collive/actions/workflows/python-app.yml/badge.svg)](https://github.com/BenjaminSnyder/collive/actions/workflows/python-app.yml)
+
 Welcome to Collive! Collive is a real-time editing REST API for developers who want to add real-time editing to their service. 
 
 Team Project for Advanced Software Engineering
