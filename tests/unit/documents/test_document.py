@@ -28,7 +28,7 @@ def test_load_document():
     assert meta["users"] == ["client1"]
 
     dictionary = doc.load_document("error_doc", "client")
-    assert dictionary == "Error, no document with id: error_doc"
+    assert dictionary == "ERROR: no document with id: error_doc"
     _ = doc.delete_document("client")
 
 
@@ -60,7 +60,7 @@ def test_delete_document():
     assert response == "SUCCESS"
 
     dictionaries = doc.load_document(doc_id, "client")
-    assert dictionaries == "Error, no document with id: " + doc_id
+    assert dictionaries == "ERROR: no document with id: " + doc_id
 
     response = doc.delete_document("client")
     assert response == "SUCCESS"
