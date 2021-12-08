@@ -83,11 +83,19 @@ class Document():
                                                          self.content,
                                                          content)
             self.revision_hash = Document_Util.create_hash(self.content)
+
             result = db.insert_revision(
                 self.token, self.document_id,
                 self.__convert_to_dict()[1])
+
             if result is not None:
                 return result
+
+            result = db.update_meta(self.token, self.document_id,
+                                    self.__convert_to_dict()[0])
+            if result is not None:
+                return result
+
         else:
             return "ERROR: Client does not have user access."
         return "SUCCESS"

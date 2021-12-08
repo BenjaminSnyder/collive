@@ -56,6 +56,17 @@ def insert_revision(token, doc_id, revision):
         doc.insert(r_pack(revision))
 
 
+def update_meta(token, doc_id, meta):
+    '''updates document meta data'''
+    doc = open_document(token, doc_id)
+    if(len(doc) == 0):
+        return ("ERROR: no document with id: " + str(doc_id))
+
+    Q = Query()
+    m = doc.get(Q.type == "meta")
+    doc.remove(doc_ids=[m.doc_id])
+    doc.insert(m_pack(meta))
+
 
 def get_revision(token, doc_id, revision_hash):
     '''returns a document revision by hash '''
@@ -70,18 +81,6 @@ def get_revision(token, doc_id, revision_hash):
 
     except IndexError:
         return ("ERROR: No revision with hash:" + str(revision_hash))
-
-
-def update_meta(token, doc_id, meta):
-    '''updates document meta data'''
-    doc = open_document(token, doc_id)
-    if(len(doc) == 0):
-        return ("ERROR: no document with id: " + str(doc_id))
-
-    Q = Query()
-    m = doc.get(Q.type == "meta")
-    doc.remove(doc_ids=[m.doc_id])
-    doc.insert(m_pack(meta))
 
 
 def get_meta(token, doc_id):
