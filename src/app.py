@@ -32,7 +32,7 @@ def get_doc():
     if type(out) == str:
         return out, 400
     elif out[1]['content'] is None:
-        return f"ERROR: client does not have access to doc_id {doc_id}", 400
+        return f"ERROR: client does not have access to doc_id {doc_id}", 403
     return jsonify(out)
 
 
@@ -54,8 +54,9 @@ def update_doc():
     doc = Document(access_token)
     msg = doc.load_document(input['doc_id'], input['client_id'])
     if type(msg) == str:
-        return msg, 400
-
+        return msg, 404
+    elif msg[1]['content'] is None:
+        return f"ERROR: client does not have access to doc_id {input['doc_id']}", 403
     msg = doc.update_content(input['content'], input['client_id'])
     return msg
 
@@ -89,8 +90,11 @@ def delete_doc():
         return err, 400
 
     doc = Document(access_token, input['client_id'])
-    doc.load_document(input['doc_id'], input['client_id'])
-
+    msg = doc.load_document(input['doc_id'], input['client_id'])
+    if type(msg) == str:
+        return msg, 404
+    elif msg[1]['content'] is None:
+        return f"ERROR: client does not have access to doc_id {input['doc_id']}", 403
     msg = doc.delete_document(input['doc_id'])
     return msg
 
