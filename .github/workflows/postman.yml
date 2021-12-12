@@ -11,27 +11,50 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  POSTMAN_TEST:
     runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v2
-        with:
+    - uses: actions/checkout@v2  
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v2
+      with:
          python-version: "3.10"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install flake8 pytest
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          export FLASK_APP=app
-          flask run
-          
-      
-      - name: Postman using newman
-        uses: matt-ball/newman-action@master
-        with:
-          collection: https://www.getpostman.com/collections/4800192a6e1355a0b482
-          envVar: '[{ "key": "url", "value": "http://localhost:5000" }]'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi 
+        
+    - name: Install Node
+      uses: actions/setup-node@v1
+      with: 
+        node-version: '12.x'
+    
+    # Install the newman command line utility and also install the html extra reporter
+    - name: Install newman
+      run: |
+       npm install -g newman
+       npm install -g newman-reporter-htmlextra
+       
+    - name: Make Directory for results
+      run: mkdir -p testResults
+        
+    - name: Newman Run
+      run: |
+        export FLASK_APP=src/app.py
+        nohup flask run &
+        echo $! > flask.pid
+        newman run https://www.getpostman.com/collections/4800192a6e1355a0b482 -r htmlextra --reporter-htmlextra-export testResults/htmlreport_doc0.html
+        newman run https://www.getpostman.com/collections/2eabfd56b4245b70c345 -r htmlextra --reporter-htmlextra-export testResults/htmlreport_doc1.html
+        newman run https://www.getpostman.com/collections/2efcf7c8040630da20fb -r htmlextra --reporter-htmlextra-export testResults/htmlreport_invalid.html
+        sleep 30
+        kill -9 `cat flask.pid`
+        
+    - name: Output the run Details
+      uses: actions/upload-artifact@v2
+      with: 
+       name: RunReports
+       path: testResults
+        
+  
+
