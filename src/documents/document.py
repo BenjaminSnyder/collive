@@ -25,12 +25,13 @@ class Document():
 
         client_id = str(client_id)
         meta = db.get_meta(self.token, document_id)
-        if "ERROR" in meta.keys():
-            return meta
+        if meta["type"] == "error":
+            return [dict.fromkeys(meta), 
+                    dict.fromkeys(self.__convert_to_dict()[1], None)]
 
         doc = db.get_revision(self.token, document_id, meta["curr_revision"])
         if doc["type"] == "error":
-            return doc
+            return [dict.fromkeys(meta), dict.fromkeys(doc, None)]
         self.__dict_to_attributes(meta, doc)
 
         if self.__authorize_client(client_id, 'v'):

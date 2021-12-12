@@ -31,7 +31,7 @@ def get_doc():
 
     doc = Document(access_token)
     out = doc.load_document(doc_id, client_id)
-    if out["type"] == "error":
+    if out[0]["type"] == "error":
         if out["code"] == "EACCESS":
             return out, 403
         else:
