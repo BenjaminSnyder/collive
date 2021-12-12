@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, json, request, jsonify
 
 from documents.document import Document
 
@@ -23,16 +23,19 @@ def get_doc():
     client_id = request.args.get('client_id')
 
     if not doc_id:
-        return "ERROR: doc_id parameter missing", 400
+        return jsonify({"type": "error",
+                        "msg": "doc_id parameter missing"}), 400
     elif not client_id:
-        return "ERROR: client_id parameter missing", 400
+        return jsonify({"type": "error",
+                        "msg": "client_id parameter missing"}), 400
 
     doc = Document(access_token)
     out = doc.load_document(doc_id, client_id)
-    if type(out) == str:
-        return out, 400
-    elif out[1]['content'] is None:
-        return f"ERROR: client does not have access to doc_id {doc_id}", 403
+    if out["type"] == "error":
+        if out["code"] == "EACCESS":
+            return out, 403
+        else:
+            return out, 400
     return jsonify(out)
 
 
@@ -49,16 +52,22 @@ def update_doc():
         return err, 400
 
     if 'content' not in input:
-        return 'ERROR: content parameter needed', 400
+        return jsonify({"type": "error",
+                        "msg": "content parameter needed"}), 400
 
     doc = Document(access_token)
     msg = doc.load_document(input['doc_id'], input['client_id'])
-    if type(msg) == str:
-        return msg, 404
-    elif msg[1]['content'] is None:
-        return f"ERROR: client does not have access to doc_id {input['doc_id']}", 403
+    if msg[0]["type"] == "error":
+        if msg["code"] == "EACCESS":
+            return msg, 403
+        else:
+            return msg, 404
+
     msg = doc.update_content(input['content'], input['client_id'])
-    return msg
+    if msg["type"] == "error":
+        return jsonify(msg), 400
+    else:
+        return jsonify(msg), 200
 
 
 @app.route('/document/create', methods=['POST'])
@@ -87,16 +96,20 @@ def delete_doc():
 
     err = check_input(['doc_id', 'client_id'], input)
     if err is not None:
-        return err, 400
+        return jsonify(err), 400
 
     doc = Document(access_token, input['client_id'])
     msg = doc.load_document(input['doc_id'], input['client_id'])
-    if type(msg) == str:
-        return msg, 404
-    elif msg[1]['content'] is None:
-        return f"ERROR: client does not have access to doc_id {input['doc_id']}", 403
+    if msg["type"] == "error":
+        if msg["code"] == "EACCESS":
+            return msg, 403
+        else:
+            return msg, 404
+
     msg = doc.delete_document(input['doc_id'])
-    return msg
+    if msg["type"] == "error":
+        return jsonify(msg), 400
+    return jsonify(msg)
 
 
 @app.route('/token/create')
@@ -116,10 +129,11 @@ def check_input(keys: list, dict: dict):
         try:
             val = dict[key]
             if not val:
-                return f"ERROR: {key} invalid input"
+                return {"type": "error", "msg": f"{key} invalid input"}
             elif type(val) != str:
-                return f"ERROR: {key} must be of type string"
+                return {"type": "error",
+                        "msg": f"{key} must be of type string"}
         except KeyError:
-            return f"ERROR: {key} parameter missing"
+            return {"type": "error", "msg": f"{key} parameter missing"}
 
     return None

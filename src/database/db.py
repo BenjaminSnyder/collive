@@ -38,63 +38,84 @@ def create_document(token, meta, revision):
 
     t.insert(m_pack(meta))
     t.insert(r_pack(revision))
-    return "" + str(m_id)
+    return meta
 
 
 def insert_revision(token, doc_id, revision):
     '''inserts a revision(rev[hash] = content) into a document by id'''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
-        return ("ERROR: no document with id: " + str(doc_id))
+        return error("EEXIST", doc_id)
 
     Rev = Query()
     if(doc.contains(Rev["revision_hash"] == revision["revision_hash"])):
-        return (str(doc_id) + "<" +
-                str(revision["revision_hash"]) +
-                "> is identical to the revision. No changes were made.")
+        return ({"type": "warning", "msg": f"{doc_id} "
+                 "<{revision['revision_hash']} >"
+                 "is identical to the revision. No changes were made."})
     else:
         doc.insert(r_pack(revision))
+        return revision
 
 
 def update_meta(token, doc_id, meta):
     '''updates document meta data'''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
-        return ("ERROR: no document with id: " + str(doc_id))
+        return error("EEXIST", doc_id)
 
     Q = Query()
     m = doc.get(Q.type == "meta")
     doc.remove(doc_ids=[m.doc_id])
     doc.insert(m_pack(meta))
+    return meta
 
 
 def get_revision(token, doc_id, revision_hash):
     '''returns a document revision by hash '''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
-        return ("ERROR: no document with id: " + str(doc_id))
+        return error("EEXIST", doc_id)
 
     Rev = Query()
     try:
         revision = doc.search(Rev["revision_hash"] == revision_hash)[0]
-        return unpack(revision)
+        return revision
 
     except IndexError:
-        return ("ERROR: No revision with hash:" + str(revision_hash))
+        return error("EDNE", f"{doc_id}: {revision_hash}")
 
 
 def get_meta(token, doc_id):
     '''returns metadata for a document'''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
-        return ("ERROR: no document with id: " + str(doc_id))
+        return error("EEXIST", doc_id)
 
     Q = Query()
     meta = doc.search(Q["type"] == "meta")[0]
-    return unpack(meta)
+    return meta
 
 
 def delete_document(token, doc_id):
     '''deletes a document by id'''
     db = open_database(token)
-    db.drop_table(str(doc_id))
+    if(doc_id in db.tables()):
+        db.drop_table(str(doc_id))
+        return {"type": "sucess", "msg": f"Deleted document with id {doc_id}"}
+    else:
+        return error("EEXIST", doc_id)
+
+
+def error(type, arg):
+    msg = ""
+    if type == "ENOTLOAD":
+        msg = f"Document not loaded"
+    elif type == "EDNE":
+        msg = f"Document with id {arg} does not exist"
+    elif type == "EEXIST":
+        msg = (f"Document {arg} is identical to the revision. "
+               "No changes were made.")
+    elif type == "EACCES":
+        msg = f"Client does not have user access to doc_id: {arg}."
+
+    return {"type": "error", "code": type, "msg": msg}
