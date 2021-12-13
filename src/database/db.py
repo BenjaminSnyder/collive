@@ -101,7 +101,7 @@ def delete_document(token, doc_id):
     db = open_database(token)
     if(doc_id in db.tables()):
         db.drop_table(str(doc_id))
-        return {"type": "sucess", "msg": f"Deleted document with id {doc_id}"}
+        return {"type": "success", "msg": f"Deleted document with id {doc_id}"}
     else:
         return error("EEXIST", doc_id)
 
@@ -115,7 +115,7 @@ def error(type, arg):
     elif type == "EEXIST":
         msg = (f"Document {arg} is identical to the revision. "
                "No changes were made.")
-    elif type == "EACCES":
+    elif type == "EACCESS":
         msg = f"Client does not have user access to doc_id: {arg}."
 
     return {"type": "error", "code": type, "msg": msg}
