@@ -100,7 +100,7 @@ def delete_doc():
 
     doc = Document(access_token, input['client_id'])
     msg = doc.load_document(input['doc_id'], input['client_id'])
-    if msg["type"] == "error":
+    if msg[0]["type"]:
         if msg["code"] == "EACCESS":
             return msg, 403
         else:
