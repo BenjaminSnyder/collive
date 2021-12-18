@@ -44,7 +44,7 @@ jobs:
         export FLASK_APP=src/app.py
         nohup flask run &
         echo $! > flask.pid
-        newman run https://www.getpostman.com/collections/4800192a6e1355a0b482 -r htmlextra --reporter-htmlextra-export testResults/htmlreport_doc2.html
+        newman run https://www.getpostman.com/collections/4800192a6e1355a0b482 -r htmlextra --reporter-htmlextra-export testResults/htmlreport_doc0.html
         newman run https://www.getpostman.com/collections/2eabfd56b4245b70c345 -r htmlextra --reporter-htmlextra-export testResults/htmlreport_doc1.html
         newman run https://www.getpostman.com/collections/2efcf7c8040630da20fb -r htmlextra --reporter-htmlextra-export testResults/htmlreport_invalid.html
         sleep 30
