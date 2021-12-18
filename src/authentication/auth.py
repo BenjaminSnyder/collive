@@ -1,7 +1,8 @@
 from flask import Response, request
 from functools import wraps
 
-TOKENS = ['f2dOqweIWy65QWlwiw', 'a1wreoijWeR20lsdwq']
+TOKENS = ['f2dOqweIWy65QWlwiw', 'a1wreoijWeR20lsdwq', 'testtoken1',
+          'testtoken2']
 
 
 def valid_credentials(token):
@@ -19,6 +20,8 @@ def authenticate(f):
     def wrapper(*args, **kwargs):
         headers = request.headers
         bearer = headers.get('Authorization')
+        if not bearer:
+            return Response('ERROR: HTTP Authorization header missing', 400)
         token = bearer.split()[1]
         if not token or not valid_credentials(token):
             return Response('ERROR: Invalid API access token', 401)

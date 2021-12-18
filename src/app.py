@@ -30,7 +30,7 @@ def get_doc():
     doc = Document(access_token)
     out = doc.load_document(doc_id, client_id)
     if type(out) == str:
-        return out, 400
+        return out, 404
     elif out[1]['content'] is None:
         return f"ERROR: client does not have access to doc_id {doc_id}", 403
     return jsonify(out)
@@ -44,12 +44,9 @@ def update_doc():
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
 
-    err = check_input(['doc_id', 'client_id'], input)
+    err = check_input(['doc_id', 'client_id', 'content'], input)
     if err is not None:
         return err, 400
-
-    if 'content' not in input:
-        return 'ERROR: content parameter needed', 400
 
     doc = Document(access_token)
     msg = doc.load_document(input['doc_id'], input['client_id'])
@@ -89,7 +86,7 @@ def delete_doc():
     if err is not None:
         return err, 400
 
-    doc = Document(access_token, input['client_id'])
+    doc = Document(access_token)
     msg = doc.load_document(input['doc_id'], input['client_id'])
     if type(msg) == str:
         return msg, 404
@@ -105,9 +102,9 @@ def create_token():
     pass
 
 
-@app.route('/client/add', methods=['POST'])
+@app.route('/client/create', methods=['POST'])
 @authenticate
-def add_client():
+def create_client():
     pass
 
 
@@ -115,10 +112,10 @@ def check_input(keys: list, dict: dict):
     for key in keys:
         try:
             val = dict[key]
-            if not val:
-                return f"ERROR: {key} invalid input"
-            elif type(val) != str:
+            if type(val) != str:
                 return f"ERROR: {key} must be of type string"
+            elif len(val) == 0:
+                return f"ERROR: {key} cannot be an empty string"
         except KeyError:
             return f"ERROR: {key} parameter missing"
 
