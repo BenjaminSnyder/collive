@@ -181,7 +181,7 @@ def test_update_meta():
 def test_create_document():
     doc = Document("test")
     meta = doc.create_document("create_doc.txt", "client")
-    assert meta["document_id"] != None
+    assert meta["document_id"] is not None
     _ = doc.load_document(meta["document_id"], "client")
     response = doc.update_content(
         "This is a a doc to update", "client")
