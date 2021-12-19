@@ -129,7 +129,7 @@ def test_get_doc_invalid_inputs(client):
     rv = client.get('/document/get', query_string=params, headers=headers)
     print(rv.data)
     assert rv.status_code == 404
-    
+
     assert rv.data == b'ERROR: no document with id: -1'
 
     params = dict(doc_id=0, client_id=-1)

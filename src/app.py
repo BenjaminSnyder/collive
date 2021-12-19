@@ -38,7 +38,7 @@ def get_doc():
         else:
             return out, 400
     return jsonify({"type": "error",
-                        "msg": "client_id parameter missing"}), 400
+                    "msg": "client_id parameter missing"}), 400
 
 
 @app.route('/document/update', methods=['POST'])
@@ -131,7 +131,7 @@ def check_input(keys: list, dict: dict):
     for key in keys:
         try:
             val = dict[key]
-            
+
             if type(val) != str:
                 return {"type": "error",
                         "msg": f"{key} must be of type string"}
