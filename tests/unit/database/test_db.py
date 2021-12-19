@@ -54,8 +54,8 @@ def test_delete():
     create_meta = db.create_document(token, meta, rev)
     meta = db.get_meta(token, create_meta["document_id"])
     rev = db.get_revision(token, create_meta["document_id"], "1111")
-    assert meta["type"] is not "error"
-    assert rev["type"] is not "error"
+    assert meta["type"] != "error"
+    assert rev["type"] != "error"
 
     result = db.delete_document(token, create_meta["document_id"])
     assert result["type"] == "success"
@@ -68,20 +68,20 @@ def test_error():
     error = db.error("ENOTLOAD", None)
     assert error["type"] == "error"
     assert error["code"] == "ENOTLOAD"
-    assert error["msg"] == f"Document not loaded"
+    assert error["msg"] == "Document not loaded"
 
     error = db.error("EDNE", "er")
     assert error["type"] == "error"
     assert error["code"] == "EDNE"
-    assert error["msg"] == f"Document with id er does not exist"
+    assert error["msg"] == "Document with id er does not exist"
 
     error = db.error("EEXIST", "er")
     assert error["type"] == "error"
     assert error["code"] == "EEXIST"
-    assert error["msg"] == (f"Document er is identical to the revision. "
+    assert error["msg"] == ("Document er is identical to the revision. "
                             "No changes were made.")
 
     error = db.error("EACCESS", "er")
     assert error["type"] == "error"
     assert error["code"] == "EACCESS"
-    assert error["msg"] == f"Client does not have user access to doc_id: er."
+    assert error["msg"] == "Client does not have user access to doc_id: er."

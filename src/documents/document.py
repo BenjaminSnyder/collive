@@ -26,17 +26,17 @@ class Document():
         client_id = str(client_id)
         meta = db.get_meta(self.token, document_id)
         if meta["type"] == "error":
-            return [dict.fromkeys(meta),
-                    dict.fromkeys(self.__convert_to_dict()[1], None)]
+            return [meta, meta]
 
         doc = db.get_revision(self.token, document_id, meta["curr_revision"])
         if doc["type"] == "error":
-            return [dict.fromkeys(meta), dict.fromkeys(doc, None)]
+            return [doc, doc]
         self.__dict_to_attributes(meta, doc)
 
         if self.__authorize_client(client_id, 'v'):
             return [meta, doc]
-        return [dict.fromkeys(meta), dict.fromkeys(doc, None)]
+        return [db.error("EACCESS", document_id),
+                db.error("EACCESS", document_id)]
 
     def get_most_recent_revision(self) -> str:
         '''returns the current content'''
@@ -54,7 +54,8 @@ class Document():
         Delete this document from the database
         if the given client is authenticated.
         '''
-
+        client_id = str(client_id)
+        print(self.users)
         client_id = str(client_id)
         if self.document_id is None:
             return db.error("ENOTLOAD", "")
@@ -135,6 +136,13 @@ class Document():
 
         self.document_id = meta["document_id"]
         return meta
+
+    def export_to_pdf(self, client_id):
+        pdf = Document_Util.export_to_pdf(client_id, self.name, self.content)
+        return pdf
+
+    def export_to_docx(self, client_id):
+        return Document_Util.export_to_docx(client_id, self.name, self.content)
 
     def __authorize_client(self, client_id, mode):
         if mode == "u":
