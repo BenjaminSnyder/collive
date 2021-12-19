@@ -153,6 +153,9 @@ def share_doc():
         new_doc_users = input['new_doc_users']
         if type(new_doc_users) != list:
             return jsonify(dict(type='error', msg='new_doc_users must be of type list'))
+        
+        if all([type(val) == str for val in new_doc_users]) is False:
+            return jsonify(dict(type='error', msg='elements of new_doc_users must be of type string'))
     except KeyError:
         new_doc_users = []
     
@@ -160,6 +163,9 @@ def share_doc():
         new_doc_viewers = input['new_doc_viewers']
         if type(new_doc_viewers) != list:
             return jsonify(dict(type='error', msg='new_doc_viewers must be of type list'))
+        
+        if all([type(val) == str for val in new_doc_users]) is False:
+            return jsonify(dict(type='error', msg='elements of new_doc_viewers must be of type string'))
     except KeyError:
         new_doc_viewers = []
 
@@ -171,9 +177,11 @@ def share_doc():
         else:
             return msg[0], 404
     
-    users = doc.users.append(new_doc_users)
-    viewers = doc.viewers.append(new_doc_users)
-    msg = doc.update_meta(doc.name, users, viewers, input['client_id'])
+    name = msg[0]['name']
+    new_doc_users.extend(list(msg[0]['users']))
+    new_doc_viewers.extend(list(msg[0]['viewers']))
+    #print(name, new_doc_users, new_doc_viewers)
+    msg = doc.update_meta(name, new_doc_users, new_doc_viewers, input['client_id'])
     if msg["type"] == "error":
         return jsonify(msg), 400
     return jsonify(msg)
