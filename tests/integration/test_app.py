@@ -12,6 +12,10 @@ def client():
     app.config.from_mapping(SECRET_KEY='dev', TESTING=True, DEBUG=True)
 
     with app.test_client() as client:
+        '''
+        Before each test case, create a document with doc_id = 0, client_id = 1, and name=initdoc
+        '''
+
         data = {"client_id": '1', "name": "initdoc"}
         headers = {'Authorization': TOKEN}
         client.post('/document/create', json=data, headers=headers)
@@ -43,12 +47,13 @@ def test_update_and_get_doc(client):
     assert json_data[1]['content'] == 'Document update!'
 
 
-'''
 def test_delete_doc(client):
     headers = {'Authorization': TOKEN}
-    data = dict(client_id='0', doc_id='0')
+    data = dict(doc_id='0', client_id='1')
     rv = client.post('/document/delete', json=data, headers=headers)
-'''
+    
+    assert rv.status_code == 200
+    assert rv.data == b'SUCCESS'
 
 
 def test_create_doc_invalid_inputs(client):
