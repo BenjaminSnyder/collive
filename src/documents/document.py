@@ -25,11 +25,13 @@ class Document():
 
         client_id = str(client_id)
         meta = db.get_meta(self.token, document_id)
-        if type(meta) == str:
-            return meta
+        if meta["type"] == "error":
+            return [dict.fromkeys(meta),
+                    dict.fromkeys(self.__convert_to_dict()[1], None)]
+
         doc = db.get_revision(self.token, document_id, meta["curr_revision"])
-        if type(doc) == str:
-            return doc
+        if doc["type"] == "error":
+            return [dict.fromkeys(meta), dict.fromkeys(doc, None)]
         self.__dict_to_attributes(meta, doc)
 
         if self.__authorize_client(client_id, 'v'):
@@ -55,16 +57,14 @@ class Document():
 
         client_id = str(client_id)
         if self.document_id is None:
-            return "ERROR: Document not loaded."
+            return db.error("ENOTLOAD", "")
         if self.__authorize_client(client_id, "u"):
             result = db.delete_document(
                 self.token,
                 self.document_id)
-            if result is not None:
-                return result
+            return result
         else:
-            return "ERROR: Client does not have user access."
-        return "SUCCESS"
+            return db.error("EACCESS", self.document_id)
 
     def update_content(self, content, client_id):
         '''
@@ -74,12 +74,12 @@ class Document():
 
         client_id = str(client_id)
         if self.document_id is None:
-            return "ERROR: Document not loaded."
+            return db.error("ENOTLOAD", "")
 
         if self.__authorize_client(client_id, "u"):
             self.content = Document_Util.update_document(self,
                                                          self.document_id,
-                                                         self.content,
+                                                         self.revision_hash,
                                                          content)
             self.revision_hash = Document_Util.create_hash(self.content)
 
@@ -87,17 +87,15 @@ class Document():
                 self.token, self.document_id,
                 self.__convert_to_dict()[1])
 
-            if result is not None:
+            if result["type"] == "error":
                 return result
 
             result = db.update_meta(self.token, self.document_id,
                                     self.__convert_to_dict()[0])
-            if result is not None:
-                return result
+            return result
 
         else:
-            return "ERROR: Client does not have user access."
-        return "SUCCESS"
+            return db.error("EACCESS", self.document_id)
 
     def update_meta(self, name, users, viewers, client_id):
         '''
@@ -107,7 +105,7 @@ class Document():
 
         client_id = str(client_id)
         if self.document_id is None:
-            return "ERROR: Document not loaded."
+            return db.error("ENOTLOAD", "")
 
         if self.__authorize_client(client_id, "u"):
             self.name = name
@@ -115,9 +113,9 @@ class Document():
             self.viewers = viewers
             result = db.update_meta(self.token, self.document_id,
                                     self.__convert_to_dict()[0])
-            if result is not None:
-                return result
-        return "SUCCESS"
+            return result
+        else:
+            return db.error("EACCESS", self.document_id)
 
     def create_document(self, name, client_id):
         '''
@@ -131,13 +129,12 @@ class Document():
         self.users = [client_id]
         self.viewers = [client_id]
         self.content = ""
-        document_id = db.create_document(
+        meta = db.create_document(
             self.token,
             self.__convert_to_dict()[0], self.__convert_to_dict()[1])
-        if document_id is None:
-            return "ERROR: Could not create new document."
-        self.document_id = document_id
-        return document_id
+
+        self.document_id = meta["document_id"]
+        return meta
 
     def __authorize_client(self, client_id, mode):
         if mode == "u":
@@ -158,8 +155,10 @@ class Document():
 
     def __dict_to_attributes(self, meta, doc):
         '''Private method to convert a dict to class attributes'''
+        meta["type"] = "meta"
         self.document_id = meta["document_id"]
         self.name = meta["name"]
+        doc["type"] = "revision"
         self.content = doc["content"]
         self.revision_hash = doc["revision_hash"]
         self.users = meta["users"]

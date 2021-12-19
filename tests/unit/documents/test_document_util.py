@@ -35,7 +35,8 @@ def test_error(requests_mock):
 def test_update_document(mocker):
     test_id = 'update document'  # noqa
     mock_doc = mocker.MagicMock()
-    mock_doc.get_revision_by_hash.return_value = 'somecontent'
+    mock_doc.get_revision_by_hash.return_value = {
+        "type": "revision", "content": "somecontent"}
     mock_doc.get_most_recent_revision.return_value = 'somecontent'
 
     results = Document_Util.update_document(

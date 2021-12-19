@@ -22,6 +22,14 @@ class Document_Util:
         old_content = document.get_revision_by_hash(
             doc_id, local_revision_hash)
 
+        try:
+            if old_content["type"] == "revision":
+                old_content = old_content["content"]
+            else:
+                old_content = ''
+        except:
+            old_content = ''
+
         # Create diff_match_patch object
         dmp = dmp_module.diff_match_patch()
 
