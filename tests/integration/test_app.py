@@ -13,7 +13,7 @@ def client():
 
     with app.test_client() as client:
         '''
-        Before each test case, create a document with doc_id = 0, client_id = 1, and name=initdoc
+        Before each test case, create a document with doc_id = 0, client_id = 1 and name = initdoc
         '''
 
         data = {"client_id": '1', "name": "initdoc"}
@@ -54,6 +54,7 @@ def test_delete_doc(client):
     
     assert rv.status_code == 200
     assert rv.data == b'SUCCESS'
+
 
 def test_delete_doc_invalid_inputs(client):
     headers = {'Authorization': TOKEN}

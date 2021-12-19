@@ -92,7 +92,7 @@ def delete_doc():
         return msg, 404
     elif msg[1]['content'] is None:
         return f"ERROR: client does not have access to doc_id {input['doc_id']}", 403
-    msg = doc.delete_document(input['doc_id'])
+    msg = doc.delete_document(input['client_id'])
     return msg
 
 
