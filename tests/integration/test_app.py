@@ -55,6 +55,25 @@ def test_delete_doc(client):
     assert rv.status_code == 200
     assert rv.data == b'SUCCESS'
 
+def test_delete_doc_invalid_inputs(client):
+    headers = {'Authorization': TOKEN}
+    data = dict(client_id='1')
+    rv = client.post('/document/delete', json=data, headers=headers)
+
+    assert rv.status_code == 400
+    assert rv.data == b'ERROR: doc_id parameter missing'
+
+    data = dict(doc_id='-1', client_id='1')
+    rv = client.post('/document/delete', json=data, headers=headers)
+
+    assert rv.status_code == 404
+    assert rv.data == b'ERROR: no document with id: -1'
+
+    data = dict(doc_id='0', client_id='-1')
+    rv = client.post('/document/delete', json=data, headers=headers)
+
+    assert rv.status_code == 403
+    assert rv.data == b'ERROR: client does not have access to doc_id 0'
 
 def test_create_doc_invalid_inputs(client):
     data = {"client_id": 1, "name": "doc2"}
@@ -63,13 +82,6 @@ def test_create_doc_invalid_inputs(client):
 
     assert rv.status_code == 400
     assert rv.data == b'ERROR: client_id must be of type string'
-
-    data = {"client_id": "1"}
-    headers = {'Authorization': TOKEN}
-    rv = client.post('/document/create', json=data, headers=headers)
-
-    assert rv.status_code == 400
-    assert rv.data == b'ERROR: name parameter missing'
 
 
 def test_update_doc_invalid_inputs(client):
@@ -81,14 +93,12 @@ def test_update_doc_invalid_inputs(client):
     assert rv.data == b'ERROR: doc_id cannot be an empty string'
     
     data = {"doc_id": "-1", "client_id": "1", "content": "test content"}
-    headers = {'Authorization': TOKEN}
     rv = client.post('/document/update', json=data, headers=headers)
 
     assert rv.status_code == 404
     assert rv.data == b'ERROR: no document with id: -1'
 
     data = {"doc_id": "0", "client_id": "-1", "content": "test content"}
-    headers = {'Authorization': TOKEN}
     rv = client.post('/document/update', json=data, headers=headers)
 
     assert rv.status_code == 403
@@ -104,21 +114,18 @@ def test_get_doc_invalid_inputs(client):
     assert rv.data == b'ERROR: doc_id parameter missing'
 
     params = dict(doc_id=0)
-    headers = {'Authorization': TOKEN}
     rv = client.get('/document/get', query_string=params, headers=headers)
 
     assert rv.status_code == 400
     assert rv.data == b'ERROR: client_id parameter missing'
 
     params = dict(doc_id = -1, client_id = 0)
-    headers = {'Authorization': TOKEN}
     rv = client.get('/document/get', query_string=params, headers=headers)
 
     assert rv.status_code == 404
     assert rv.data == b'ERROR: no document with id: -1'
 
     params = dict(doc_id=0, client_id = -1)
-    headers = {'Authorization': TOKEN}
     rv = client.get('/document/get', query_string=params, headers=headers)
 
     assert rv.status_code == 403
