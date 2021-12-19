@@ -53,7 +53,8 @@ class Document():
         Delete this document from the database
         if the given client is authenticated.
         '''
-
+        client_id = str(client_id)
+        print(self.users)
         client_id = str(client_id)
         if self.document_id is None:
             return db.error("ENOTLOAD", "")

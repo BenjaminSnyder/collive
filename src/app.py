@@ -33,10 +33,10 @@ def get_doc():
     out = doc.load_document(doc_id, client_id)
     if out[0]["type"] == "error":
         if out[0]["code"] == "EACCESS":
-            return out, 403
+            return out[0], 403
         else:
-            return out, 400
-    return jsonify(out), 200
+            return out[0], 404
+    return jsonify(out)
 
 
 @app.route('/document/update', methods=['POST'])
@@ -58,10 +58,10 @@ def update_doc():
     doc = Document(access_token)
     msg = doc.load_document(input['doc_id'], input['client_id'])
     if msg[0]["type"] == "error":
-        if msg["code"] == "EACCESS":
-            return msg, 403
+        if msg[0]["code"] == "EACCESS":
+            return msg[0], 403
         else:
-            return msg, 404
+            return msg[0], 404
 
     msg = doc.update_content(input['content'], input['client_id'])
     if msg["type"] == "error":
@@ -100,14 +100,12 @@ def delete_doc():
 
     doc = Document(access_token)
     msg = doc.load_document(input['doc_id'], input['client_id'])
-
-    if msg[0]["type"]:
-        if msg["code"] == "EACCESS":
-            return msg, 403
+    if msg[0]["type"] == "error":
+        if msg[0]["code"] == "EACCESS":
+            return msg[0], 403
         else:
-            return msg, 404
-
-    msg = doc.delete_document(input['doc_id'])
+            return msg[0], 404
+    msg = doc.delete_document(input['client_id'])
     if msg["type"] == "error":
         return jsonify(msg), 400
     return jsonify(msg)

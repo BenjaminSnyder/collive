@@ -51,9 +51,9 @@ def test_delete_doc(client):
     headers = {'Authorization': TOKEN}
     data = dict(doc_id='0', client_id='1')
     rv = client.post('/document/delete', json=data, headers=headers)
-
+    print(rv.data)
     assert rv.status_code == 200
-    assert rv.data == b'SUCCESS'
+    assert rv.data == b'{\n  "msg": "Deleted document with id 0", \n  "type": "success"\n}\n'
 
 
 def test_delete_doc_invalid_inputs(client):
@@ -62,19 +62,19 @@ def test_delete_doc_invalid_inputs(client):
     rv = client.post('/document/delete', json=data, headers=headers)
 
     assert rv.status_code == 400
-    assert rv.data == b'ERROR: doc_id parameter missing'
+    assert rv.data == b'{\n  "msg": "doc_id parameter missing", \n  "type": "error"\n}\n'
 
     data = dict(doc_id='-1', client_id='1')
     rv = client.post('/document/delete', json=data, headers=headers)
 
     assert rv.status_code == 404
-    assert rv.data == b'ERROR: no document with id: -1'
+    assert rv.data == b'{\n  "code": "EEXIST", \n  "msg": "Document -1 is identical to the revision. No changes were made.", \n  "type": "error"\n}\n'
 
     data = dict(doc_id='0', client_id='-1')
     rv = client.post('/document/delete', json=data, headers=headers)
 
     assert rv.status_code == 403
-    assert rv.data == b'ERROR: client does not have access to doc_id 0'
+    assert rv.data == b'{\n  "code": "EACCESS", \n  "msg": "Client does not have user access to doc_id: 0.", \n  "type": "error"\n}\n'
 
 
 def test_create_doc_invalid_inputs(client):
@@ -99,15 +99,15 @@ def test_update_doc_invalid_inputs(client):
     data = {"doc_id": "-1", "client_id": "1", "content": "test content"}
     rv = client.post('/document/update', json=data, headers=headers)
 
-    assert rv.status_code == 400
+    assert rv.status_code == 404
     #assert rv.get_json()['msg'] == 'Document does not exist'
     assert rv.get_json()['type'] == 'error'
 
     data = {"doc_id": "0", "client_id": "-1", "content": "test content"}
     rv = client.post('/document/update', json=data, headers=headers)
 
-    assert rv.status_code == 400
-    assert rv.get_json()['msg'] == 'Client does not have access to document'
+    assert rv.status_code == 403
+    assert rv.get_json()['msg'] == 'Client does not have user access to doc_id: 0.'
     assert rv.get_json()['type'] == 'error'
 
 
@@ -127,14 +127,12 @@ def test_get_doc_invalid_inputs(client):
 
     params = dict(doc_id=-1, client_id=0)
     rv = client.get('/document/get', query_string=params, headers=headers)
-    print(rv.data)
     assert rv.status_code == 404
     
-    assert rv.data == b'ERROR: no document with id: -1'
+    assert rv.data == b'{\n  "code": "EEXIST", \n  "msg": "Document -1 is identical to the revision. No changes were made.", \n  "type": "error"\n}\n'
 
     params = dict(doc_id=0, client_id=-1)
     rv = client.get('/document/get', query_string=params, headers=headers)
 
     assert rv.status_code == 403
-    print(rv.data)
-    assert rv.data == b'ERROR: client does not have access to doc_id 0'
+    assert rv.data == b'{\n  "code": "EACCESS", \n  "msg": "Client does not have user access to doc_id: 0.", \n  "type": "error"\n}\n'
