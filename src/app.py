@@ -110,6 +110,7 @@ def delete_doc():
         return jsonify(msg), 400
     return jsonify(msg)
 
+
 @app.route('/document/export/pdf')
 @authenticate
 def export_doc():
@@ -128,7 +129,7 @@ def export_doc():
     doc = Document(access_token)
     out = doc.load_document(doc_id, client_id)
     url = doc.export_to_pdf(client_id)
-    
+
     if url == '':
         return jsonify({"type": "error",
                         "msg": "Something went wrong!"}), 500
@@ -155,7 +156,7 @@ def share_doc():
             return jsonify(dict(type='error', msg='new_doc_users must be of type list'))
     except KeyError:
         new_doc_users = []
-    
+
     try:
         new_doc_viewers = input['new_doc_viewers']
         if type(new_doc_viewers) != list:
@@ -170,7 +171,7 @@ def share_doc():
             return msg[0], 403
         else:
             return msg[0], 404
-    
+
     users = doc.users.append(new_doc_users)
     viewers = doc.viewers.append(new_doc_users)
     msg = doc.update_meta(doc.name, users, viewers, input['client_id'])
