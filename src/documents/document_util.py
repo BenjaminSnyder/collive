@@ -45,5 +45,4 @@ class Document_Util:
         req = requests.get(f"{hashify_url}?value={content}")
         if 'Digest' in req.json():
             return req.json()['Digest']
-        else:
-            return Exception("There was an error with the Hashify API")
+        return Exception("There was an error with the Hashify API")
