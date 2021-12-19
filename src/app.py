@@ -36,6 +36,8 @@ def get_doc():
             return out, 403
         else:
             return out, 400
+    if out[1]['content'] is None:
+        return jsonify(dict(type="error", msg="Client does not have access to document"))
     return jsonify(out)
 
 
@@ -134,7 +136,7 @@ def check_input(keys: list, dict: dict):
                 return {"type": "error",
                         "msg": f"{key} must be of type string"}
             elif len(val) == 0:
-                return {"type": "error", "msg": f"{key} invalid input"}
+                return {"type": "error", "msg": f"{key} cannot be an empty string"}
 
         except KeyError:
             return {"type": "error", "msg": f"{key} parameter missing"}
