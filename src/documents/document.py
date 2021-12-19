@@ -26,17 +26,16 @@ class Document():
         client_id = str(client_id)
         meta = db.get_meta(self.token, document_id)
         if meta["type"] == "error":
-            return [dict.fromkeys(meta),
-                    dict.fromkeys(self.__convert_to_dict()[1], None)]
+            return [meta, meta]
 
         doc = db.get_revision(self.token, document_id, meta["curr_revision"])
         if doc["type"] == "error":
-            return [dict.fromkeys(meta), dict.fromkeys(doc, None)]
+            return [doc, doc]
         self.__dict_to_attributes(meta, doc)
 
         if self.__authorize_client(client_id, 'v'):
             return [meta, doc]
-        return [dict.fromkeys(meta), dict.fromkeys(doc, None)]
+        return [db.error("EACCESS", document_id), db.error("EACCESS", document_id)]
 
     def get_most_recent_revision(self) -> str:
         '''returns the current content'''

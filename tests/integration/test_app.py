@@ -112,22 +112,24 @@ def test_get_doc_invalid_inputs(client):
     rv = client.get('/document/get', query_string=params, headers=headers)
 
     assert rv.status_code == 400
-    assert rv.data == b'ERROR: doc_id parameter missing'
+    assert rv.data == b'{\n  "msg": "doc_id parameter missing", \n  "type": "error"\n}\n'
 
     params = dict(doc_id=0)
     rv = client.get('/document/get', query_string=params, headers=headers)
 
     assert rv.status_code == 400
-    assert rv.data == b'ERROR: client_id parameter missing'
+    assert rv.data == b'{\n  "msg": "client_id parameter missing", \n  "type": "error"\n}\n'
 
     params = dict(doc_id = -1, client_id = 0)
     rv = client.get('/document/get', query_string=params, headers=headers)
-
+    print(rv.data)
     assert rv.status_code == 404
+    
     assert rv.data == b'ERROR: no document with id: -1'
 
     params = dict(doc_id=0, client_id = -1)
     rv = client.get('/document/get', query_string=params, headers=headers)
 
     assert rv.status_code == 403
+    print(rv.data)
     assert rv.data == b'ERROR: client does not have access to doc_id 0'

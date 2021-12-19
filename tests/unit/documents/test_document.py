@@ -29,10 +29,10 @@ def test_load_document():
 
     dictionaries = doc.load_document("error_doc", "client")
     dictionary = dictionaries[0]
-    assert dictionary["type"] is None
+    assert dictionary["type"] == "error"
 
     dictionary = doc.load_document(create_meta["document_id"], "client222")
-    assert dictionary[1]["content"] is None
+    assert dictionary[1]["type"] =="error"
     _ = doc.delete_document("client")
 
 
@@ -85,7 +85,7 @@ def test_delete_document():
     assert response["msg"] == f"Deleted document with id {create_meta['document_id']}"
 
     dictionaries = doc.load_document(create_meta["document_id"], "client")
-    assert dictionaries[1]["content"] == None
+    assert dictionaries[1]["type"] == "error"
 
     response = doc.delete_document("client")
     assert response["type"] == "error"
