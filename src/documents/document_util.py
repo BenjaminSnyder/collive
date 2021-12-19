@@ -29,7 +29,6 @@ class Document_Util:
                 old_content = ''
         except:
             old_content = ''
-        
 
         # Create diff_match_patch object
         dmp = dmp_module.diff_match_patch()

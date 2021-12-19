@@ -1,5 +1,5 @@
 from documents.document import Document
-import pytest # noqa
+import pytest  # noqa
 
 
 def test_load_document():
@@ -45,22 +45,24 @@ def test_get_most_recent_revision():
 
 def test_get_revision_by_hash():
     doc = Document("test")
-    create_meta= doc.create_document("rev_doc.txt", "client")
+    create_meta = doc.create_document("rev_doc.txt", "client")
     _ = doc.update_content("This is a doc to rev", "client")
-    dictionary = doc.get_revision_by_hash(create_meta["document_id"], doc.revision_hash)
+    dictionary = doc.get_revision_by_hash(
+        create_meta["document_id"], doc.revision_hash)
     assert dictionary["revision_hash"] == doc.revision_hash
     assert dictionary["content"] == "This is a doc to rev"
 
-    response = doc.get_revision_by_hash("docyError","error")
+    response = doc.get_revision_by_hash("docyError", "error")
     assert response['type'] == "error"
     assert response["code"] == "EEXIST"
     assert response["msg"] == (f"Document docyError is identical to the revision. "
-               "No changes were made.")
+                               "No changes were made.")
 
-    response = doc.get_revision_by_hash(create_meta["document_id"],"error")
+    response = doc.get_revision_by_hash(create_meta["document_id"], "error")
     assert response['type'] == "error"
     assert response["code"] == "EDNE"
     assert response["msg"] == f"Document with id {create_meta['document_id']}: error does not exist"
+
 
 def test_delete_document():
     doc = Document("test")
@@ -72,7 +74,7 @@ def test_delete_document():
     create_meta = doc.create_document('delete_doc.txt', "client")
     response = doc.update_content("This is a doc to delete", "client")
     dictionaries = doc.load_document(create_meta["document_id"], "client")
-    
+
     response = doc.delete_document("client2")
     assert response["type"] == "error"
     assert response["code"] == "EACCESS"
@@ -102,7 +104,7 @@ def test_update_content():
     doc = Document("test")
     dictionaries = doc.load_document(create_meta["document_id"], "client")
     response = doc.update_content("This is a doc to update", "client")
-    assert doc.content== "This is a doc to update"
+    assert doc.content == "This is a doc to update"
 
     dictionaries = doc.load_document(create_meta["document_id"], "client")
     meta = dictionaries[0]
@@ -118,7 +120,8 @@ def test_update_content():
     assert doc.document_id == create_meta["document_id"]
     assert doc.revision_hash != revision_hash
 
-    response = doc.update_content("This is a doc to update unauthorized", "client123")
+    response = doc.update_content(
+        "This is a doc to update unauthorized", "client123")
     assert response["type"] == "error"
     assert response["code"] == "EACCESS"
     assert response["msg"] == f"Client does not have user access to doc_id: {doc.document_id}."

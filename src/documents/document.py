@@ -26,7 +26,7 @@ class Document():
         client_id = str(client_id)
         meta = db.get_meta(self.token, document_id)
         if meta["type"] == "error":
-            return [dict.fromkeys(meta), 
+            return [dict.fromkeys(meta),
                     dict.fromkeys(self.__convert_to_dict()[1], None)]
 
         doc = db.get_revision(self.token, document_id, meta["curr_revision"])

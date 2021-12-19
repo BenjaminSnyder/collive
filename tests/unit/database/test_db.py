@@ -1,5 +1,5 @@
 import database.db as db
-import pytest # noqa
+import pytest  # noqa
 
 
 def test_create_insert_and_get():
@@ -39,12 +39,13 @@ def test_create_insert_and_get():
     assert rev["revision_hash"] == "3333"
     assert rev["content"] == "second document, rev 3"
 
+
 def test_delete():
     meta = {'document_id': "",
-        'curr_revision': "",
-        'name': "test document Delete",
-        'users': ["test_user1", "test_user2"],
-        'viewers': ["test_user1", "test_user2"]}
+            'curr_revision': "",
+            'name': "test document Delete",
+            'users': ["test_user1", "test_user2"],
+            'viewers': ["test_user1", "test_user2"]}
     rev = {'revision_hash': "1111",
            'content': "test document contents"}
 
@@ -52,7 +53,7 @@ def test_delete():
     db.open_database(token)
     create_meta = db.create_document(token, meta, rev)
     meta = db.get_meta(token, create_meta["document_id"])
-    rev = db.get_revision(token,create_meta["document_id"], "1111")
+    rev = db.get_revision(token, create_meta["document_id"], "1111")
     assert meta["type"] is not "error"
     assert rev["type"] is not "error"
 
@@ -61,6 +62,7 @@ def test_delete():
 
     meta = db.get_meta(token, create_meta["document_id"])
     assert meta["type"] == "error"
+
 
 def test_error():
     error = db.error("ENOTLOAD", None)
@@ -77,7 +79,7 @@ def test_error():
     assert error["type"] == "error"
     assert error["code"] == "EEXIST"
     assert error["msg"] == (f"Document er is identical to the revision. "
-               "No changes were made.")
+                            "No changes were made.")
 
     error = db.error("EACCESS", "er")
     assert error["type"] == "error"
