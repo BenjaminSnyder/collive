@@ -111,6 +111,7 @@ def delete_doc():
         return jsonify(msg), 400
     return jsonify(msg)
 
+
 @app.route('/document/export/pdf')
 @authenticate
 def export_doc():
@@ -129,7 +130,7 @@ def export_doc():
     doc = Document(access_token)
     out = doc.load_document(doc_id, client_id)
     url = doc.export_to_pdf(client_id)
-    
+
     if url == '':
         return jsonify({"type": "error",
                         "msg": "Something went wrong!"}), 500
@@ -154,17 +155,17 @@ def share_doc():
         new_doc_users = input['new_doc_users']
         if type(new_doc_users) != list:
             return jsonify(dict(type='error', msg='new_doc_users must be of type list'))
-        
+
         if all([type(val) == str for val in new_doc_users]) is False:
             return jsonify(dict(type='error', msg='elements of new_doc_users must be of type string'))
     except KeyError:
         new_doc_users = []
-    
+
     try:
         new_doc_viewers = input['new_doc_viewers']
         if type(new_doc_viewers) != list:
             return jsonify(dict(type='error', msg='new_doc_viewers must be of type list'))
-        
+
         if all([type(val) == str for val in new_doc_users]) is False:
             return jsonify(dict(type='error', msg='elements of new_doc_viewers must be of type string'))
     except KeyError:
@@ -177,7 +178,7 @@ def share_doc():
             return msg[0], 403
         else:
             return msg[0], 404
-    
+
     name = msg[0]['name']
     new_doc_users.extend(list(msg[0]['users']))
     new_doc_viewers.extend(list(msg[0]['viewers']))

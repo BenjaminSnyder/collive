@@ -22,6 +22,7 @@ open_access_database()
 update_access('JamesMoriarty', [])
 update_access('JamesBond', [])
 
+
 @app.before_request
 def before_request():
     username = session.get('username')
@@ -30,8 +31,8 @@ def before_request():
     else:
         g.account = username
 
-@app.route('/')
 
+@app.route('/')
 @app.route('/index')
 def index():
     username = session.get('username')
@@ -42,6 +43,7 @@ def index():
             doc_name = return_doc_name(id)
             doc_list.append({'doc_id': id, 'doc_name': doc_name})
     return render_template('index.html', doc_list=doc_list)
+
 
 @app.route('/login', methods=('GET', 'POST'))
 def login():
@@ -63,10 +65,12 @@ def login():
 
     return render_template('login.html')
 
+
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect('/login')
+
 
 @app.route('/register', methods=('GET', 'POST'))
 def register():
@@ -76,13 +80,13 @@ def register():
         error = None
 
         if not username:
-          error = 'Username is required.'
+            error = 'Username is required.'
         elif not password:
-          error = 'Password is required.'
+            error = 'Password is required.'
         else:
             db = open_user_database()
             user = Query()
-            pair = db.search(user['username'] == username) # check if the username already exists
+            pair = db.search(user['username'] == username)  # check if the username already exists
             if not pair:
                 client_id = str(get_user_count())
                 db.insert({'username': username, 'password': password, 'client_id': client_id})
@@ -92,6 +96,7 @@ def register():
                 error = 'Username already exists.'
         flash(error)
     return render_template('register.html')
+
 
 @app.route('/create', methods=['POST'])
 def create_document():
@@ -106,6 +111,7 @@ def create_document():
     flash("Document successfully created!")
     return redirect('index')
 
+
 @app.route('/document', methods=['GET'])
 def display_document():
     doc_id = request.args.get('doc_id')
@@ -116,6 +122,7 @@ def display_document():
     info = json.loads(response.text)
     print(info)
     return render_template('document.html', doc_info=info, client_id=client_id)
+
 
 @app.route('/send', methods=['POST'])
 def send():
@@ -135,6 +142,7 @@ def send():
     info = json.loads(response.text)
     print(info)
     return render_template('document.html', doc_info=info, client_id=client_id)
+
 
 @app.route('/share', methods=['POST'])
 def share():
