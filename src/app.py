@@ -31,14 +31,14 @@ def get_doc():
 
     doc = Document(access_token)
     out = doc.load_document(doc_id, client_id)
+    print(out)
     if out[0]["type"] == "error":
-        if out["code"] == "EACCESS":
+        if out[0]["code"] == "EACCESS":
             return out, 403
         else:
             return out, 400
-    if out[1]['content'] is None:
-        return jsonify(dict(type="error", msg="Client does not have access to document"))
-    return jsonify(out)
+    return jsonify({"type": "error",
+                        "msg": "client_id parameter missing"}), 400
 
 
 @app.route('/document/update', methods=['POST'])
