@@ -1,4 +1,5 @@
 from flask import Flask, json, request, jsonify
+from requests.api import get
 
 from documents.document import Document
 
@@ -13,7 +14,7 @@ app.config.from_mapping(SECRET_KEY='dev')
 # Database of document is determined by access token
 
 
-@app.route('/document/get')
+@app.route('/document/get', methods=['GET'])
 @authenticate
 def get_doc():
     '''Returns the most recently updated document
@@ -85,8 +86,8 @@ def create_doc():
 
     doc = Document(access_token)
 
-    doc_id = doc.create_document(input['name'], input['client_id'])
-    return doc_id
+    meta = doc.create_document(input['name'], input['client_id'])
+    return meta
 
 
 @app.route('/document/delete', methods=['POST'])

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}{{doc_info[0]['name']}}{% endblock %}</h1>
+{% endblock %}
+
+
+{% block content %}
+<body>
+
+<form method="POST" action="/share">
+Username: <input type="text" name="username" style="width: 30%;"/>
+document id: <input type="text" style="width: 30%;" name="doc_id" value="{{doc_info[0]['document_id']}}" readonly/>
+<input type="submit" value="Share" style="float: right"/>
+</form>
+
+<textarea id="textbox_input" cols="123" rows="20">
+{{doc_info[1]['content']}}
+</textarea>
+
+<div id="place_for_suggestions"></div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<script>
+  $("#textbox_input").keyup(function(){
+      var text = $(this).val();
+      var doc_id = '{{ doc_info[0]["document_id"] }}';
+      var client_id = '{{ client_id }}';
+      console.log(text)
+      console.log(doc_id)
+      console.log(client_id)
+      $.ajax({
+        url: "/send",
+        type: "post",
+        dataType: "json",
+        data: {
+          content: text,
+          doc_id: doc_id,
+          client_id: client_id,
+        },
+        success: function(response) {
+          $("#place_for_suggestions").html(response);
+        },
+        error: function(xhr) {
+          //Do Something to handle error
+        }
+      });
+  });
+  </script>
+
+  <script>
+  //   function fetchdata(){
+  //     var id = '{{ doc_info[0]["document_id"] }}';
+  //     $.ajax({
+  //      url: '/document',
+  //      type: 'get',
+  //      data: {doc_id: id},
+  //      success: function(response){
+  //        document.getElementById("#place_for_suggestions").innerHTML = response;
+  //      }
+  //     });
+  //    }
+  //    
+  //    $(document).ready(function(){
+  //     setInterval(fetchdata,500);
+  //    });
+  </script>
+
+</body>
+{% endblock %}
+</html>

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Collive{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+{% if not g.account%}
+  <b>Register or login to start using Collive!</b>
+{% endif %}
+
+{% if g.account%}
+<b>Create a new document:</b>
+<form method="POST" action="/create">
+  <p>Document name:</p>
+  <input type="text" name="doc_name">
+  <input type="submit" value="Create new document"/>
+</form>
+
+<b>Open your existing documents:</b>
+{% if doc_list%}
+<table style="text-align:left;">
+  <tr>
+  </tr>
+  {% for doc_dict in doc_list %}
+  {% if doc_dict['doc_id'] and doc_dict['doc_name']%}
+  <tr>
+    <th class="document">
+      <a href={{ "/document?doc_id={}".format(doc_dict['doc_id']) }}>{{doc_dict['doc_name']}}</a>
+    </th>
+  </tr>
+  {% endif %}
+  {% endfor %}
+</table>
+{% endif %}
+{% endif %}
+{% endblock %}
+
+</html>
