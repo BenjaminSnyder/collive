@@ -111,16 +111,48 @@ def delete_doc():
     return jsonify(msg)
 
 
-@app.route('/token/create')
-def create_token():
-    '''Generates a database and returns the access_token'''
-    pass
-
-
-@app.route('/client/create', methods=['POST'])
+@app.route('/document/share', methods=['POST'])
 @authenticate
-def create_client():
-    pass
+def share_doc():
+    '''
+    Shares document with new users and viewers.
+    JSON parameters: doc_id, client_id, new_doc_users (list), new_doc_viewers (list)
+    '''
+    access_token = request.headers.get('Authorization')
+    input = request.get_json(force=True)
+
+    err = check_input(['doc_id', 'client_id'], input)
+    if err is not None:
+        return jsonify(err), 400
+
+    try:
+        new_doc_users = input['new_doc_users']
+        if type(new_doc_users) != list:
+            return jsonify(dict(type='error', msg='new_doc_users must be of type list'))
+    except KeyError:
+        new_doc_users = []
+    
+    try:
+        new_doc_viewers = input['new_doc_viewers']
+        if type(new_doc_viewers) != list:
+            return jsonify(dict(type='error', msg='new_doc_viewers must be of type list'))
+    except KeyError:
+        new_doc_viewers = []
+
+    doc = Document(access_token)
+    msg = doc.load_document(input['doc_id'], input['client_id'])
+    if msg[0]["type"] == "error":
+        if msg[0]["code"] == "EACCESS":
+            return msg[0], 403
+        else:
+            return msg[0], 404
+    
+    users = doc.users.append(new_doc_users)
+    viewers = doc.viewers.append(new_doc_users)
+    msg = doc.update_meta(doc.name, users, viewers, input['client_id'])
+    if msg["type"] == "error":
+        return jsonify(msg), 400
+    return jsonify(msg)
 
 
 def check_input(keys: list, dict: dict):
