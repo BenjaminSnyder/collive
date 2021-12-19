@@ -1,0 +1,22 @@
+version = 1
+
+dependency_file_paths = [
+  "requirements.txt"
+]
+test_patterns = [
+  "tests/**",
+  "test_*.py"
+]
+
+[[analyzers]]
+name = "python"
+enabled = true
+
+  [analyzers.meta]
+  runtime_version = "3.x.x"
+  
+ 
+[[transformers]]
+name = "autopep8"
+enabled = true
+

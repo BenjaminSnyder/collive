@@ -36,8 +36,7 @@ class Document():
 
         if self.__authorize_client(client_id, 'v'):
             return [meta, doc]
-        else:
-            return [dict.fromkeys(meta), dict.fromkeys(doc, None)]
+        return [dict.fromkeys(meta), dict.fromkeys(doc, None)]
 
     def get_most_recent_revision(self) -> str:
         '''returns the current content'''
@@ -140,7 +139,7 @@ class Document():
     def __authorize_client(self, client_id, mode):
         if mode == "u":
             return (client_id in self.users)
-        elif mode == "v":
+        if mode == "v":
             return (client_id in self.viewers)
         return False
 

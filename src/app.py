@@ -47,9 +47,10 @@ def update_doc():
     access_token = request.headers.get('Authorization')
     input = request.get_json(force=True)
 
-    err = check_input(['doc_id', 'client_id'], input)
+    err = check_input(['doc_id', 'client_id', 'content'], input)
     if err is not None:
         return err, 400
+
 
     if 'content' not in input:
         return jsonify({"type": "error",
@@ -98,8 +99,9 @@ def delete_doc():
     if err is not None:
         return jsonify(err), 400
 
-    doc = Document(access_token, input['client_id'])
+    doc = Document(access_token)
     msg = doc.load_document(input['doc_id'], input['client_id'])
+
     if msg[0]["type"]:
         if msg["code"] == "EACCESS":
             return msg, 403
@@ -112,15 +114,16 @@ def delete_doc():
     return jsonify(msg)
 
 
+
 @app.route('/token/create')
 def create_token():
     '''Generates a database and returns the access_token'''
     pass
 
 
-@app.route('/client/add', methods=['POST'])
+@app.route('/client/create', methods=['POST'])
 @authenticate
-def add_client():
+def create_client():
     pass
 
 
@@ -133,6 +136,7 @@ def check_input(keys: list, dict: dict):
             elif type(val) != str:
                 return {"type": "error",
                         "msg": f"{key} must be of type string"}
+
         except KeyError:
             return {"type": "error", "msg": f"{key} parameter missing"}
 
