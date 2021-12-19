@@ -38,7 +38,7 @@ def test_update_and_get_doc(client):
     data = dict(client_id='1', doc_id='0', content='Document update!')
     rv = client.post('/document/update', json=data, headers=headers)
     assert rv.status_code == 200
-    assert rv.data == b'SUCCESS'
+    assert rv.get_json()['type'] == 'meta'
 
     params = dict(doc_id=0, client_id=1)
     rv = client.get('/document/get', query_string=params, headers=headers)
@@ -83,7 +83,8 @@ def test_create_doc_invalid_inputs(client):
     rv = client.post('/document/create', json=data, headers=headers)
 
     assert rv.status_code == 400
-    assert rv.data == b'ERROR: client_id must be of type string'
+    assert rv.get_json()['msg'] == 'client_id must be of type string'
+    assert rv.get_json()['type'] == 'error'
 
 
 def test_update_doc_invalid_inputs(client):
@@ -92,19 +93,22 @@ def test_update_doc_invalid_inputs(client):
     rv = client.post('/document/update', json=data, headers=headers)
 
     assert rv.status_code == 400
-    assert rv.data == b'ERROR: doc_id cannot be an empty string'
+    assert rv.get_json()['msg'] == 'doc_id cannot be an empty string'
+    assert rv.get_json()['type'] == 'error'
 
     data = {"doc_id": "-1", "client_id": "1", "content": "test content"}
     rv = client.post('/document/update', json=data, headers=headers)
 
-    assert rv.status_code == 404
-    assert rv.data == b'ERROR: no document with id: -1'
+    assert rv.status_code == 400
+    #assert rv.get_json()['msg'] == 'Document does not exist'
+    assert rv.get_json()['type'] == 'error'
 
     data = {"doc_id": "0", "client_id": "-1", "content": "test content"}
     rv = client.post('/document/update', json=data, headers=headers)
 
-    assert rv.status_code == 403
-    assert rv.data == b'ERROR: client does not have access to doc_id 0'
+    assert rv.status_code == 400
+    assert rv.get_json()['msg'] == 'Client does not have access to document'
+    assert rv.get_json()['type'] == 'error'
 
 
 def test_get_doc_invalid_inputs(client):
