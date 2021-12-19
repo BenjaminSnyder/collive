@@ -114,7 +114,7 @@ def test_update_content():
 
     response = doc.update_content(
         "This is a doc to update version 2", "client")
-    assert doc.content == "This is a doc to update version 2This is a doc to update"
+    assert doc.content == "This is a doc to update version 2"
     assert doc.document_id == create_meta["document_id"]
     assert doc.revision_hash != revision_hash
 
