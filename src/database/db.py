@@ -52,8 +52,7 @@ def insert_revision(token, doc_id, revision):
         return (str(doc_id) + "<" +
                 str(revision["revision_hash"]) +
                 "> is identical to the revision. No changes were made.")
-    else:
-        doc.insert(r_pack(revision))
+    doc.insert(r_pack(revision))
 
 
 def update_meta(token, doc_id, meta):

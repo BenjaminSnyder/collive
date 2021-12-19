@@ -24,14 +24,14 @@ def get_doc():
 
     if not doc_id:
         return "ERROR: doc_id parameter missing", 400
-    elif not client_id:
+    if not client_id:
         return "ERROR: client_id parameter missing", 400
 
     doc = Document(access_token)
     out = doc.load_document(doc_id, client_id)
     if type(out) == str:
         return out, 404
-    elif out[1]['content'] is None:
+    if out[1]['content'] is None:
         return f"ERROR: client does not have access to doc_id {doc_id}", 403
     return jsonify(out)
 
@@ -52,7 +52,7 @@ def update_doc():
     msg = doc.load_document(input['doc_id'], input['client_id'])
     if type(msg) == str:
         return msg, 404
-    elif msg[1]['content'] is None:
+    if msg[1]['content'] is None:
         return f"ERROR: client does not have access to doc_id {input['doc_id']}", 403
     msg = doc.update_content(input['content'], input['client_id'])
     return msg
@@ -90,7 +90,7 @@ def delete_doc():
     msg = doc.load_document(input['doc_id'], input['client_id'])
     if type(msg) == str:
         return msg, 404
-    elif msg[1]['content'] is None:
+    if msg[1]['content'] is None:
         return f"ERROR: client does not have access to doc_id {input['doc_id']}", 403
     msg = doc.delete_document(input['client_id'])
     return msg
@@ -114,7 +114,7 @@ def check_input(keys: list, dict: dict):
             val = dict[key]
             if type(val) != str:
                 return f"ERROR: {key} must be of type string"
-            elif len(val) == 0:
+            if len(val) == 0:
                 return f"ERROR: {key} cannot be an empty string"
         except KeyError:
             return f"ERROR: {key} parameter missing"
