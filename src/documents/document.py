@@ -80,7 +80,7 @@ class Document():
         if self.__authorize_client(client_id, "u"):
             self.content = Document_Util.update_document(self,
                                                          self.document_id,
-                                                         self.content,
+                                                         self.revision_hash,
                                                          content)
             self.revision_hash = Document_Util.create_hash(self.content)
 
