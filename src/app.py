@@ -129,11 +129,12 @@ def check_input(keys: list, dict: dict):
     for key in keys:
         try:
             val = dict[key]
-            if not val:
-                return {"type": "error", "msg": f"{key} invalid input"}
-            elif type(val) != str:
+            
+            if type(val) != str:
                 return {"type": "error",
                         "msg": f"{key} must be of type string"}
+            elif len(val) == 0:
+                return {"type": "error", "msg": f"{key} invalid input"}
 
         except KeyError:
             return {"type": "error", "msg": f"{key} parameter missing"}
