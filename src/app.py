@@ -127,7 +127,7 @@ def check_input(keys: list, dict: dict):
     for key in keys:
         try:
             val = dict[key]
-            
+
             if type(val) != str:
                 return {"type": "error",
                         "msg": f"{key} must be of type string"}

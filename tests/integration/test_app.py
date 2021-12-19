@@ -107,7 +107,8 @@ def test_update_doc_invalid_inputs(client):
     rv = client.post('/document/update', json=data, headers=headers)
 
     assert rv.status_code == 403
-    assert rv.get_json()['msg'] == 'Client does not have user access to doc_id: 0.'
+    assert rv.get_json()[
+        'msg'] == 'Client does not have user access to doc_id: 0.'
     assert rv.get_json()['type'] == 'error'
 
 
@@ -128,7 +129,7 @@ def test_get_doc_invalid_inputs(client):
     params = dict(doc_id=-1, client_id=0)
     rv = client.get('/document/get', query_string=params, headers=headers)
     assert rv.status_code == 404
-    
+
     assert rv.data == b'{\n  "code": "EEXIST", \n  "msg": "Document -1 is identical to the revision. No changes were made.", \n  "type": "error"\n}\n'
 
     params = dict(doc_id=0, client_id=-1)
