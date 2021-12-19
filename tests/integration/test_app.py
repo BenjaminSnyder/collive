@@ -30,7 +30,7 @@ def test_create_doc(client):
     headers = {'Authorization': TOKEN}
     rv = client.post('/document/create', json=data, headers=headers)
     assert rv.status_code == 200
-    assert rv.data == b'1'
+    assert rv.get_json()['document_id'] == '1'
 
 
 def test_update_and_get_doc(client):
