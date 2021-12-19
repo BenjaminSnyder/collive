@@ -13,7 +13,9 @@ def client():
 
     with app.test_client() as client:
         '''
-        Before each test case, create a document with doc_id = 0, client_id = 1 and name = initdoc
+        Before each test case,
+        create a document with doc_id = 0,
+        client_id = 1 and name = initdoc
         '''
 
         data = {"client_id": '1', "name": "initdoc"}
@@ -100,7 +102,6 @@ def test_update_doc_invalid_inputs(client):
     rv = client.post('/document/update', json=data, headers=headers)
 
     assert rv.status_code == 404
-    #assert rv.get_json()['msg'] == 'Document does not exist'
     assert rv.get_json()['type'] == 'error'
 
     data = {"doc_id": "0", "client_id": "-1", "content": "test content"}
@@ -128,7 +129,6 @@ def test_get_doc_invalid_inputs(client):
     params = dict(doc_id=-1, client_id=0)
     rv = client.get('/document/get', query_string=params, headers=headers)
     assert rv.status_code == 404
-    
     assert rv.data == b'{\n  "code": "EEXIST", \n  "msg": "Document -1 is identical to the revision. No changes were made.", \n  "type": "error"\n}\n'
 
     params = dict(doc_id=0, client_id=-1)

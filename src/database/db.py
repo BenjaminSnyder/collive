@@ -109,7 +109,7 @@ def delete_document(token, doc_id):
 def error(type, arg):
     msg = ""
     if type == "ENOTLOAD":
-        msg = f"Document not loaded"
+        msg = "Document not loaded"
     elif type == "EDNE":
         msg = f"Document with id {arg} does not exist"
     elif type == "EEXIST":

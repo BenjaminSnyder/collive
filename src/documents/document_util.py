@@ -27,7 +27,7 @@ class Document_Util:
                 old_content = old_content["content"]
             else:
                 old_content = ''
-        except:
+        except KeyError:
             old_content = ''
 
         # Create diff_match_patch object

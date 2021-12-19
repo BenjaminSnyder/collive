@@ -35,7 +35,8 @@ class Document():
 
         if self.__authorize_client(client_id, 'v'):
             return [meta, doc]
-        return [db.error("EACCESS", document_id), db.error("EACCESS", document_id)]
+        return [db.error("EACCESS", document_id),
+                db.error("EACCESS", document_id)]
 
     def get_most_recent_revision(self) -> str:
         '''returns the current content'''

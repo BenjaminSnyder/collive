@@ -1,4 +1,4 @@
-from flask import Flask, json, request, jsonify
+from flask import Flask, request, jsonify
 
 from documents.document import Document
 
@@ -127,12 +127,12 @@ def check_input(keys: list, dict: dict):
     for key in keys:
         try:
             val = dict[key]
-            
             if type(val) != str:
                 return {"type": "error",
                         "msg": f"{key} must be of type string"}
             elif len(val) == 0:
-                return {"type": "error", "msg": f"{key} cannot be an empty string"}
+                return {"type": "error",
+                        "msg": f"{key} cannot be an empty string"}
 
         except KeyError:
             return {"type": "error", "msg": f"{key} parameter missing"}
