@@ -9,4 +9,4 @@ pytest-mock
 requests_mock
 tinydb
 python-docx
-cloudmersive-convert-api-client
+convertapi

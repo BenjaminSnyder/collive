@@ -110,6 +110,30 @@ def delete_doc():
         return jsonify(msg), 400
     return jsonify(msg)
 
+@app.route('/document/export/pdf')
+@authenticate
+def export_doc():
+    '''returns the current revision to the user as a PDF document'''
+    access_token = request.headers.get('Authorization')
+    doc_id = request.args.get('doc_id')
+    client_id = request.args.get('client_id')
+
+    if not doc_id:
+        return jsonify({"type": "error",
+                        "msg": "doc_id parameter missing"}), 400
+    elif not client_id:
+        return jsonify({"type": "error",
+                        "msg": "client_id parameter missing"}), 400
+
+    doc = Document(access_token)
+    out = doc.load_document(doc_id, client_id)
+    url = doc.export_to_pdf(client_id)
+    
+    if url == '':
+        return jsonify({"type": "error",
+                        "msg": "Something went wrong!"}), 500
+    return jsonify(url)
+
 
 @app.route('/token/create')
 def create_token():
