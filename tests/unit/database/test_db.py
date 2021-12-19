@@ -1,5 +1,5 @@
 import database.db as db
-import pytest # noqa
+import pytest  # noqa
 
 
 def test_create_insert_and_get():

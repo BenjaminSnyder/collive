@@ -1,4 +1,4 @@
-import pytest # noqa
+import pytest  # noqa
 from authentication.auth import valid_credentials
 
 

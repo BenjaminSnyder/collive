@@ -1,5 +1,5 @@
 from documents.document import Document
-import pytest # noqa
+import pytest  # noqa
 
 
 def test_load_document():
