@@ -32,7 +32,7 @@ def test_load_document():
     assert dictionary["type"] == "error"
 
     dictionary = doc.load_document(create_meta["document_id"], "client222")
-    assert dictionary[1]["type"] =="error"
+    assert dictionary[1]["type"] == "error"
     _ = doc.delete_document("client")
 
 
