@@ -51,7 +51,6 @@ def update_doc():
     if err is not None:
         return err, 400
 
-
     if 'content' not in input:
         return jsonify({"type": "error",
                         "msg": "content parameter needed"}), 400
@@ -112,7 +111,6 @@ def delete_doc():
     if msg["type"] == "error":
         return jsonify(msg), 400
     return jsonify(msg)
-
 
 
 @app.route('/token/create')
