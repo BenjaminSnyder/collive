@@ -1,8 +1,5 @@
 version = 1
 
-[[analyzers]]
-name = "python"
-enabled = true
 dependency_file_paths = [
   "requirements.txt"
 ]
@@ -10,6 +7,11 @@ test_patterns = [
   "tests/**",
   "test_*.py"
 ]
+
+[[analyzers]]
+name = "python"
+enabled = true
+
 
 [[transformers]]
 name = "autopep8"
