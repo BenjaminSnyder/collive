@@ -1,5 +1,11 @@
+import io
 import diff_match_patch as dmp_module
 import requests
+from docx import Document
+import convertapi
+import os
+
+convertapi.api_secret = os.environ.get('CONVERT_API_SECRET') or ''
 
 
 global hashify_url
@@ -54,3 +60,40 @@ class Document_Util:
         if 'Digest' in req.json():
             return req.json()['Digest']
         return Exception("There was an error with the Hashify API")
+
+    @staticmethod
+    def export_to_pdf(client_id, title, text):
+        docx_file = Document_Util.export_to_docx(client_id, title, text)
+        params = {
+            "FileName": f"{title}",
+            "File": convertapi.UploadIO(docx_file, f'{title}.docx'),
+            "StoreFile": True,
+            "Timeout": 15
+        }
+        
+        result = convertapi.convert('pdf', params, from_format="docx")
+        return result.file.url
+
+
+    @staticmethod
+    def export_to_docx(client_id, title, text):
+        document = Document()
+        document.add_heading(title, 0)
+        document.add_paragraph(text)
+        # safe_client_id = Document_Util._make_safe_filename(client_id)
+        # safe_doc_name = Document_Util._make_safe_filename(title)
+        # filename = f'{safe_client_id}/{safe_doc_name}.docx'
+        file = io.BytesIO()
+        document.save(file)
+        file.seek(0)
+        return file
+
+    # def _make_safe_filename(s):
+    #     ''' ensures that filename is safe for filepath, code from stackoverflow'''
+    #     def safe_char(c):
+    #         if c.isalnum():
+    #             return c
+    #         else:
+    #             return "_"
+    #     return "".join(safe_char(c) for c in s).rstrip("_")
+

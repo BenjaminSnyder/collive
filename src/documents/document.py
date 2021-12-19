@@ -137,6 +137,13 @@ class Document():
         self.document_id = meta["document_id"]
         return meta
 
+    def export_to_pdf(self, client_id):
+        pdf = Document_Util.export_to_pdf(client_id, self.name, self.content)
+        return pdf
+
+    def export_to_docx(self, client_id):
+        return Document_Util.export_to_docx(client_id, self.name, self.content)
+
     def __authorize_client(self, client_id, mode):
         if mode == "u":
             return (client_id in self.users)
