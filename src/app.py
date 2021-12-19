@@ -110,6 +110,7 @@ def delete_doc():
         return jsonify(msg), 400
     return jsonify(msg)
 
+
 @app.route('/document/export/pdf')
 @authenticate
 def export_doc():
@@ -128,7 +129,7 @@ def export_doc():
     doc = Document(access_token)
     out = doc.load_document(doc_id, client_id)
     url = doc.export_to_pdf(client_id)
-    
+
     if url == '':
         return jsonify({"type": "error",
                         "msg": "Something went wrong!"}), 500

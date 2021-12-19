@@ -70,10 +70,9 @@ class Document_Util:
             "StoreFile": True,
             "Timeout": 15
         }
-        
+
         result = convertapi.convert('pdf', params, from_format="docx")
         return result.file.url
-
 
     @staticmethod
     def export_to_docx(client_id, title, text):
@@ -96,4 +95,3 @@ class Document_Util:
     #         else:
     #             return "_"
     #     return "".join(safe_char(c) for c in s).rstrip("_")
-
