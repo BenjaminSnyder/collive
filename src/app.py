@@ -199,8 +199,9 @@ def get_all_docs():
     if err is not None:
         return err, 400
 
-    msg = db.get_all_docs(access_token, input['client_id'])
-    if msg['type'] == 'error':
+    msg = db.get_user_documents(access_token, input['client_id'])
+    if msg.get('type') == 'error':
+        print(msg)
         return jsonify(msg), 400
     return jsonify(msg), 200
 
@@ -213,7 +214,7 @@ def check_input(keys: list, dict: dict):
                         "msg": f"{key} must be of type string"}
             if len(val) == 0:
                 return {"type": "error",
-                        "msg": f"{key} cannot be an empty string"}
+                        "msg": f"{key} cannot be a empty string"}
 
         except KeyError:
             return {"type": "error", "msg": f"{key} parameter missing"}

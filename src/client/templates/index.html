@@ -22,11 +22,11 @@
 <table style="text-align:left;">
   <tr>
   </tr>
-  {% for doc_dict in doc_list %}
-  {% if doc_dict['doc_id'] and doc_dict['doc_name']%}
+  {% for doc in doc_list %}
+  {% if doc['document_id'] and doc['name'] %}
   <tr>
     <th class="document">
-      <a href={{ "/document?doc_id={}".format(doc_dict['doc_id']) }}>{{doc_dict['doc_name']}}</a>
+      <a href={{ '/document?doc_id={}'.format(doc['document_id']) }}>{{ doc['name'] }}</a>
     </th>
   </tr>
   {% endif %}

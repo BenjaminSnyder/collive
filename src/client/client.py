@@ -1,12 +1,18 @@
+from flask.helpers import url_for
+from flask.json import jsonify
 import requests
 import os
 from flask import Flask, request, render_template, g, redirect, Response, flash, session
+from requests.api import get
 from users import open_user_database, insert_user, validate_user, get_user_count, get_client_id
 from access import open_access_database, update_access, return_access, add_doc
 from doc_id import open_doc_id_database, update_doc_name, return_doc_name
 from tinydb import TinyDB, Query
 import json
 import pprint
+
+HOSTURL = os.environ.get('PRODUCTION') or '127.0.0.1'
+PORT = 5000
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -36,13 +42,16 @@ def before_request():
 @app.route('/index')
 def index():
     username = session.get('username')
-    doc_ids = return_access(username)
-    doc_list = []
-    if doc_ids:
-        for id in doc_ids:
-            doc_name = return_doc_name(id)
-            doc_list.append({'doc_id': id, 'doc_name': doc_name})
-    return render_template('index.html', doc_list=doc_list)
+    
+    headers = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw', 'Connection': 'keep-alive', 'Accept': '*/*'}
+    request_url = f'http://{HOSTURL}:{PORT}/client/get/documents'
+    # print(get_client_id(g.account))
+    response = requests.post(url=request_url, headers=headers, json={"client_id": get_client_id(g.account)})
+    if not response.status_code == 200:
+        return render_template('index.html', doc_list={})
+    data = response.json()
+    docs = data.get('documents')
+    return render_template('index.html', doc_list=docs)
 
 
 @app.route('/login', methods=('GET', 'POST'))
@@ -103,12 +112,28 @@ def create_document():
     client_id = get_client_id(g.account)
     bearer = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw'}
     params = {'client_id': client_id, 'name': doc_name}
-    response = requests.post(url='http://127.0.0.1:5000/document/create', headers=bearer, json=params)
-    info = json.loads(response.text)
-    add_doc(g.account, str(info['document_id']))
-    update_doc_name(str(info['document_id']), str(info['name']))
+    response = requests.post(url=f'http://{HOSTURL}:{PORT}/document/create', headers=bearer, json=params)
+    if response.text:
+        info = json.loads(response.text)
+    else:
+        info = {}
+    add_doc(g.account, str(info.get('document_id')))
+    update_doc_name(str(info.get('document_id')), str(info.get('name')))
     flash("Document successfully created!")
     return redirect('index')
+
+@app.route('/getupdatedcontent', methods=['GET'])
+def get_updated_document_text():
+    doc_id = request.args.get('doc_id')
+    client_id = get_client_id(g.account)
+    headers = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw', 'Connection': 'keep-alive', 'Accept': '*/*'}
+    request_url = f'http://{HOSTURL}:{PORT}/document/get?doc_id={doc_id}&client_id={client_id}'
+    response = requests.get(url=request_url, headers=headers)
+    info = json.loads(response.text)
+    if info[0].get('type') == 'error':
+        return render_template('document.html', doc_info=info, client_id=client_id, error='No new changes')
+    print(info)
+    return jsonify(info[1]['content'])
 
 
 @app.route('/document', methods=['GET'])
@@ -116,10 +141,13 @@ def display_document():
     doc_id = request.args.get('doc_id')
     client_id = get_client_id(g.account)
     headers = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw', 'Connection': 'keep-alive', 'Accept': '*/*'}
-    request_url = 'http://127.0.0.1:5000/document/get?doc_id={doc_id}&client_id={client_id}'.format(doc_id=doc_id, client_id=client_id)
+    request_url = f'http://{HOSTURL}:{PORT}/document/get?doc_id={doc_id}&client_id={client_id}'
     response = requests.get(url=request_url, headers=headers)
     info = json.loads(response.text)
-    print(info)
+    if isinstance(info, dict):
+        if info.get('type') == 'error':
+            flash("You don't have access to that document!")
+            return redirect(url_for('index'))
     return render_template('document.html', doc_info=info, client_id=client_id)
 
 
@@ -133,25 +161,38 @@ def send():
     headers = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw', 'Connection': 'keep-alive', 'Accept': '*/*'}
     params = {'client_id': client_id, 'doc_id': doc_id, 'content': content}
     print(params)
-    response = requests.post(url='http://127.0.0.1:5000/document/update', headers=headers, json=params)
+    response = requests.post(url=f'http://{HOSTURL}:{PORT}/document/update', headers=headers, json=params)
     print(response)
-
-    request_url = 'http://127.0.0.1:5000/document/get?doc_id={doc_id}&client_id={client_id}'.format(doc_id=doc_id, client_id=client_id)
-    response = requests.get(url=request_url, headers=headers)
-    info = json.loads(response.text)
-    print(info)
-    return render_template('document.html', doc_info=info, client_id=client_id)
+    return jsonify({'success': True}), 200
+    # request_url = f'http://{HOSTURL}:{PORT}/document/get?doc_id={doc_id}&client_id={client_id}'
+    # response = requests.get(url=request_url, headers=headers)
+    # info = json.loads(response.text)
+    # print(info)
+    # return render_template('document.html', doc_info=info, client_id=client_id)
 
 
 @app.route('/share', methods=['POST'])
 def share():
     username = request.form['username']
     doc_id = request.form['doc_id']
-    add_doc(username, doc_id)
 
+    db = open_user_database()
+    user = Query()
+    user = db.search(user['username'] == username) 
+    if not user:
+        flash("User does not exist!")
+        return redirect('document?doc_id={doc_id}'.format(doc_id=doc_id))
+    new_client_id = user[0]['client_id']
     client_id = get_client_id(g.account)
+
     headers = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw', 'Connection': 'keep-alive', 'Accept': '*/*'}
-    request_url = 'http://127.0.0.1:5000/document/get?doc_id={doc_id}&client_id={client_id}'.format(doc_id=doc_id, client_id=client_id)
+    request_url = f'http://{HOSTURL}:{PORT}/document/share'
+    response = requests.post(url=request_url, headers=headers, json={'new_doc_users': [new_client_id], 'doc_id': doc_id, 'client_id': client_id})
+    if response.json()['type'] == "error":
+        flash(f"There was a problem! {response.json()['msg']}")
+        return redirect('document?doc_id={doc_id}'.format(doc_id=doc_id))
+    headers = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw', 'Connection': 'keep-alive', 'Accept': '*/*'}
+    request_url = f'http://{HOSTURL}:{PORT}/document/get?doc_id={doc_id}&client_id={client_id}'
     response = requests.get(url=request_url, headers=headers)
     info = json.loads(response.text)
     flash("Shared with " + username + "!")

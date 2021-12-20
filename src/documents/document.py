@@ -144,7 +144,7 @@ class Document():
         if mode == "u":
             return (client_id in self.users)
         if mode == "v":
-            return (client_id in self.viewers)
+            return (client_id in self.viewers or client_id in self.users)
         return False
 
     def __convert_to_dict(self):
