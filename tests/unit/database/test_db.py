@@ -42,7 +42,10 @@ def test_create_insert_and_get():
     assert rev["content"] == "second document, rev 3"
 
     test = db.get_user_documents(token, "xyz_user")
-    assert test["documents"][0]["document_id"] == create_meta["document_id"]
+    highest = -1
+    for doc in test["documents"]:
+        highest=max(int(doc['document_id']), highest)
+    assert str(highest) == create_meta["document_id"]
 
 
 def test_delete():
