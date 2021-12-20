@@ -1,5 +1,6 @@
 import pytest
 import os
+from urllib.parse import urlparse
 
 from app import app
 
@@ -148,3 +149,13 @@ def test_get_doc_invalid_inputs(client):
 
     assert rv.status_code == 403
     assert rv.data == b'{\n  "code": "EACCESS", \n  "msg": "Client does not have user access to doc_id: 0.", \n  "type": "error"\n}\n'
+
+
+def test_export_pdf(client):
+    params = dict(doc_id="0", client_id="1")
+    headers = {'Authorization': TOKEN}
+    rv = client.get('/document/export/pdf', query_string=params, headers=headers)
+
+    url = rv.get_json['url']
+    assert rv.status_code == 200
+    assert urlparse(url).hostname == 'v2.convertapi.com'

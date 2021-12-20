@@ -125,7 +125,11 @@ def export_doc():
                         "msg": "client_id parameter missing"}), 400
 
     doc = Document(access_token)
-    out = doc.load_document(doc_id, client_id)
+    msg = doc.load_document(input['doc_id'], input['client_id'])
+    if msg[0]["type"] == "error":
+        if msg[0]["code"] == "EACCESS":
+            return msg[0], 403
+        return msg[0], 404
     url = doc.export_to_pdf(client_id)
 
     if url == '':
