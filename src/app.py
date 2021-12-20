@@ -183,6 +183,28 @@ def share_doc():
         return jsonify(msg), 400
     return jsonify(msg)
 
+@app.route('/document/get/all', methods=['POST'])
+@authenticate
+def get_all_docs():
+    '''Gets all doc_ids of a client'''
+    access_token = request.headers.get('Authorization')
+    input = request.get_json(force=True)
+
+    err = check_input(['client_id'], input)
+    if err is not None:
+        return err, 400
+
+    doc = Document(access_token)
+    msg = doc.load_document(input['doc_id'], input['client_id'])
+    if msg[0]["type"] == "error":
+        if msg[0]["code"] == "EACCESS":
+            return msg[0], 403
+        return msg[0], 404
+
+    msg = doc.get_all_docs(input['client_id'])
+    if msg["type"] == "error":
+        return jsonify(msg), 400
+    return jsonify(msg), 200
 
 def check_input(keys: list, dict: dict):
     for key in keys:
