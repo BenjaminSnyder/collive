@@ -182,11 +182,12 @@ def share_doc():
     name = msg[0]['name']
     new_doc_users.extend(msg[0]['users'])
     new_doc_viewers.extend(msg[0]['viewers'])
-    
+
     msg = doc.update_meta(name, new_doc_users, new_doc_viewers, input['client_id'])
     if msg["type"] == "error":
         return jsonify(msg), 400
     return jsonify(msg)
+
 
 @app.route('/client/get/documents', methods=['POST'])
 @authenticate
@@ -199,10 +200,12 @@ def get_all_docs():
     if err is not None:
         return err, 400
 
-    msg = db.get_all_docs(access_token, input['client_id'])
-    if msg['type'] == 'error':
+    msg = db.get_user_documents(access_token, input['client_id'])
+    if msg.get('type') == 'error':
+        print(msg)
         return jsonify(msg), 400
     return jsonify(msg), 200
+
 
 def check_input(keys: list, dict: dict):
     for key in keys:
