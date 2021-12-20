@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Flask, json, request, jsonify
+from requests.api import get
 
 from documents.document import Document
 
@@ -13,7 +14,7 @@ app.config.from_mapping(SECRET_KEY='dev')
 # Database of document is determined by access token
 
 
-@app.route('/document/get')
+@app.route('/document/get', methods=['GET'])
 @authenticate
 def get_doc():
     '''Returns the most recently updated document
@@ -25,7 +26,7 @@ def get_doc():
     if not doc_id:
         return jsonify({"type": "error",
                         "msg": "doc_id parameter missing"}), 400
-    elif not client_id:
+    if not client_id:
         return jsonify({"type": "error",
                         "msg": "client_id parameter missing"}), 400
 
@@ -34,8 +35,7 @@ def get_doc():
     if out[0]["type"] == "error":
         if out[0]["code"] == "EACCESS":
             return out[0], 403
-        else:
-            return out[0], 404
+        return out[0], 404
     return jsonify(out)
 
 
@@ -60,14 +60,12 @@ def update_doc():
     if msg[0]["type"] == "error":
         if msg[0]["code"] == "EACCESS":
             return msg[0], 403
-        else:
-            return msg[0], 404
+        return msg[0], 404
 
     msg = doc.update_content(input['content'], input['client_id'])
     if msg["type"] == "error":
         return jsonify(msg), 400
-    else:
-        return jsonify(msg), 200
+    return jsonify(msg), 200
 
 
 @app.route('/document/create', methods=['POST'])
@@ -83,8 +81,8 @@ def create_doc():
 
     doc = Document(access_token)
 
-    doc_id = doc.create_document(input['name'], input['client_id'])
-    return doc_id
+    meta = doc.create_document(input['name'], input['client_id'])
+    return meta
 
 
 @app.route('/document/delete', methods=['POST'])
@@ -103,12 +101,12 @@ def delete_doc():
     if msg[0]["type"] == "error":
         if msg[0]["code"] == "EACCESS":
             return msg[0], 403
-        else:
-            return msg[0], 404
+        return msg[0], 404
     msg = doc.delete_document(input['client_id'])
     if msg["type"] == "error":
         return jsonify(msg), 400
     return jsonify(msg)
+
 
 @app.route('/document/export/pdf')
 @authenticate
@@ -121,14 +119,14 @@ def export_doc():
     if not doc_id:
         return jsonify({"type": "error",
                         "msg": "doc_id parameter missing"}), 400
-    elif not client_id:
+    if not client_id:
         return jsonify({"type": "error",
                         "msg": "client_id parameter missing"}), 400
 
     doc = Document(access_token)
     out = doc.load_document(doc_id, client_id)
     url = doc.export_to_pdf(client_id)
-    
+
     if url == '':
         return jsonify({"type": "error",
                         "msg": "Something went wrong!"}), 500
@@ -153,17 +151,17 @@ def share_doc():
         new_doc_users = input['new_doc_users']
         if type(new_doc_users) != list:
             return jsonify(dict(type='error', msg='new_doc_users must be of type list'))
-        
+
         if all([type(val) == str for val in new_doc_users]) is False:
             return jsonify(dict(type='error', msg='elements of new_doc_users must be of type string'))
     except KeyError:
         new_doc_users = []
-    
+
     try:
         new_doc_viewers = input['new_doc_viewers']
         if type(new_doc_viewers) != list:
             return jsonify(dict(type='error', msg='new_doc_viewers must be of type list'))
-        
+
         if all([type(val) == str for val in new_doc_users]) is False:
             return jsonify(dict(type='error', msg='elements of new_doc_viewers must be of type string'))
     except KeyError:
@@ -174,9 +172,8 @@ def share_doc():
     if msg[0]["type"] == "error":
         if msg[0]["code"] == "EACCESS":
             return msg[0], 403
-        else:
-            return msg[0], 404
-    
+        return msg[0], 404
+
     name = msg[0]['name']
     new_doc_users.extend(msg[0]['users'])
     new_doc_viewers.extend(msg[0]['viewers'])
@@ -194,7 +191,7 @@ def check_input(keys: list, dict: dict):
             if type(val) != str:
                 return {"type": "error",
                         "msg": f"{key} must be of type string"}
-            elif len(val) == 0:
+            if len(val) == 0:
                 return {"type": "error",
                         "msg": f"{key} cannot be an empty string"}
 

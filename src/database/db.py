@@ -52,9 +52,8 @@ def insert_revision(token, doc_id, revision):
         return ({"type": "warning", "msg": f"{doc_id} "
                  "<{revision['revision_hash']} >"
                  "is identical to the revision. No changes were made."})
-    else:
-        doc.insert(r_pack(revision))
-        return revision
+    doc.insert(r_pack(revision))
+    return revision
 
 
 def update_meta(token, doc_id, meta):
@@ -102,8 +101,7 @@ def delete_document(token, doc_id):
     if(doc_id in db.tables()):
         db.drop_table(str(doc_id))
         return {"type": "success", "msg": f"Deleted document with id {doc_id}"}
-    else:
-        return error("EEXIST", doc_id)
+    return error("EEXIST", doc_id)
 
 
 def error(type, arg):
