@@ -157,9 +157,9 @@ def test_export_pdf(client):
     '''
     CONVERT_API_SECRET environment variable must be set. 
     '''
-    # params = dict(doc_id="0", client_id="1")
-    # headers = {'Authorization': TOKEN}
-    # temp = os.environ.get('CONVERT_API_SECRET')
+    params = dict(doc_id="0", client_id="1")
+    headers = {'Authorization': TOKEN}
+    temp = os.environ.get('CONVERT_API_SECRET')
     # os.environ['CONVERT_API_SECRET'] = ''
 
     # with pytest.raises(ApiError):
@@ -167,15 +167,15 @@ def test_export_pdf(client):
 
     #     ''' test invalid case '''
     #     url = rv.get_json()['url']
-    #     assert rv.status_code == 401
+    #     assert rv.status_code == 200
     # os.environ['CONVERT_API_SECRET'] = temp
 
-    # '''test valid case'''
-    # headers = {'Authorization': TOKEN}
-    # rv = client.get('/document/export/pdf', query_string=params, headers=headers)
-    # url = rv.get_json()['url']
-    # assert rv.status_code == 200
-    # assert urlparse(url).hostname == 'v2.convertapi.com'
+    '''test valid case'''
+    headers = {'Authorization': TOKEN}
+    rv = client.get('/document/export/pdf', query_string=params, headers=headers)
+    url = rv.get_json()['url']
+    assert rv.status_code == 200
+    assert urlparse(url).hostname == 'v2.convertapi.com'
 
 
 '''
