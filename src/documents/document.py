@@ -134,8 +134,8 @@ class Document():
         return meta
 
     def export_to_pdf(self, client_id):
-        pdf = Document_Util.export_to_pdf(client_id, self.name, self.content)
-        return pdf
+        pdf_url = Document_Util.export_to_pdf(client_id, self.name, self.content)
+        return pdf_url
 
     def export_to_docx(self, client_id):
         return Document_Util.export_to_docx(client_id, self.name, self.content)

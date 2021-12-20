@@ -1,3 +1,4 @@
+from convertapi.exceptions import ApiError
 import pytest
 import os
 from urllib.parse import urlparse
@@ -152,10 +153,26 @@ def test_get_doc_invalid_inputs(client):
 
 
 def test_export_pdf(client):
+    '''
+    CONVERT_API_SECRET environment variable must be set. 
+    '''
     params = dict(doc_id="0", client_id="1")
     headers = {'Authorization': TOKEN}
     rv = client.get('/document/export/pdf', query_string=params, headers=headers)
 
-    url = rv.get_json['url']
+    url = rv.get_json()['url']
     assert rv.status_code == 200
     assert urlparse(url).hostname == 'v2.convertapi.com'
+
+
+'''
+def test_export_pdf_invalid_secret(client):
+
+    params = dict(doc_id="0", client_id="1")
+    headers = {'Authorization': TOKEN}
+    
+    with pytest.raises(ApiError) as e_info:
+        rv = client.get('/document/export/pdf', query_string=params, headers=headers)
+
+    assert e_info.value.message == 'User credentials not set, secret or token must be passed.'
+'''

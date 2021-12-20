@@ -125,17 +125,17 @@ def export_doc():
                         "msg": "client_id parameter missing"}), 400
 
     doc = Document(access_token)
-    msg = doc.load_document(input['doc_id'], input['client_id'])
+    msg = doc.load_document(doc_id, client_id)
     if msg[0]["type"] == "error":
         if msg[0]["code"] == "EACCESS":
             return msg[0], 403
         return msg[0], 404
-    url = doc.export_to_pdf(client_id)
 
+    url = doc.export_to_pdf(client_id)
     if url == '':
         return jsonify({"type": "error",
                         "msg": "Something went wrong!"}), 500
-    return jsonify(url)
+    return jsonify(dict(url=url))
 
 
 @app.route('/document/share', methods=['POST'])
