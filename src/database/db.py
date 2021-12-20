@@ -48,7 +48,7 @@ def create_document(token, meta, revision):
 def insert_revision(token, doc_id, revision):
     '''inserts a revision(rev[hash] = content) into a document by id'''
     doc = open_document(token, doc_id)
-    
+
     if(len(doc) == 0):
         return error("EEXIST", doc_id)
 
@@ -111,7 +111,7 @@ def delete_document(token, doc_id):
 
 def get_user_documents(token, user):
     ret = {"documents": []}
-    db  = open_database(token)
+    db = open_database(token)
     Q = Query()
     for table in db.tables():
         doc = db.table(table)

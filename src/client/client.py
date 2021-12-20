@@ -42,7 +42,7 @@ def before_request():
 @app.route('/index')
 def index():
     username = session.get('username')
-    
+
     headers = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw', 'Connection': 'keep-alive', 'Accept': '*/*'}
     request_url = f'http://{HOSTURL}:{PORT}/client/get/documents'
     # print(get_client_id(g.account))
@@ -122,6 +122,7 @@ def create_document():
     flash("Document successfully created!")
     return redirect('index')
 
+
 @app.route('/getupdatedcontent', methods=['GET'])
 def get_updated_document_text():
     doc_id = request.args.get('doc_id')
@@ -178,7 +179,7 @@ def share():
 
     db = open_user_database()
     user = Query()
-    user = db.search(user['username'] == username) 
+    user = db.search(user['username'] == username)
     if not user:
         flash("User does not exist!")
         return redirect('document?doc_id={doc_id}'.format(doc_id=doc_id))
