@@ -163,4 +163,3 @@ def test_export_pdf(client):
     headers = {'Authorization': os.environ.get('CONVERT_API_SECRET')}
     rv = client.get('/document/export/pdf', query_string=params, headers=headers)
     assert rv.status_code == 200
-
