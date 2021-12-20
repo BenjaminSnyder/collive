@@ -157,5 +157,10 @@ def test_export_pdf(client):
     rv = client.get('/document/export/pdf', query_string=params, headers=headers)
 
     url = rv.get_json['url']
-    assert rv.status_code == 200
+    assert rv.status_code == 401
     assert urlparse(url).hostname == 'v2.convertapi.com'
+
+    headers = {'Authorization': os.environ.get('CONVERT_API_SECRET')}
+    rv = client.get('/document/export/pdf', query_string=params, headers=headers)
+    assert rv.status_code == 200
+
