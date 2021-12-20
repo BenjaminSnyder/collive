@@ -153,7 +153,7 @@ def send():
     code = response.status_code
     error = response.text
     if code != 200:
-        flash('{code} error: {error}'.format(code=code, error=error))
+        flash('{code} error: {error}. {Info}'.format(code=code, error=error, Info=info))
         return redirect('index')
     print(info)
     return render_template('document.html', doc_info=info, client_id=client_id)
