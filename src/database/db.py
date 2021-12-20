@@ -1,4 +1,5 @@
-from tinydb import TinyDB, Query
+from flask.templating import _default_template_ctx_processor
+from tinydb import TinyDB, Query, where
 
 
 def r_pack(revision):
@@ -25,6 +26,9 @@ def open_database(token) -> TinyDB:
 def open_document(token, doc_id):
     '''creates a new database table for a document by id'''
     db = open_database(token)
+    if(len(db) > 10):
+        id = db.all()[-1]
+        db.remove(where('id') <= id-9)
     t = db.table(str(doc_id))
     return t
 
@@ -44,6 +48,7 @@ def create_document(token, meta, revision):
 def insert_revision(token, doc_id, revision):
     '''inserts a revision(rev[hash] = content) into a document by id'''
     doc = open_document(token, doc_id)
+
     if(len(doc) == 0):
         return error("EEXIST", doc_id)
 
@@ -73,7 +78,7 @@ def get_revision(token, doc_id, revision_hash):
     '''returns a document revision by hash '''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
-        return error("EEXIST", doc_id)
+        return error("ENOTLOAD", doc_id)
 
     Rev = Query()
     try:
@@ -88,7 +93,7 @@ def get_meta(token, doc_id):
     '''returns metadata for a document'''
     doc = open_document(token, doc_id)
     if(len(doc) == 0):
-        return error("EEXIST", doc_id)
+        return error("ENOTLOAD", doc_id)
 
     Q = Query()
     meta = doc.search(Q["type"] == "meta")[0]
@@ -106,7 +111,7 @@ def delete_document(token, doc_id):
 
 def get_user_documents(token, user):
     ret = {"documents": []}
-    db  = open_database(token)
+    db = open_database(token)
     Q = Query()
     for table in db.tables():
         doc = db.table(table)

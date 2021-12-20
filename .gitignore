@@ -117,3 +117,5 @@ dmypy.json
 
 # Personal
 token.json
+test.json
+Bearer*.json

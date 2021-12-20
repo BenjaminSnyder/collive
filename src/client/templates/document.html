@@ -14,6 +14,8 @@ document id: <input type="text" style="width: 30%;" name="doc_id" value="{{doc_i
 <input type="submit" value="Share" style="float: right"/>
 </form>
 
+<button id="export">Export to PDF</button>
+
 <textarea id="textbox_input" cols="123" rows="20">
 {{doc_info[1]['content']}}
 </textarea>
@@ -22,8 +24,68 @@ document id: <input type="text" style="width: 30%;" name="doc_id" value="{{doc_i
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
+<iframe id="idown" style="display:none;"></iframe>
+
+<script>
+downloadURL = function(url) {
+	function download(url){
+    window.location = url;
+
+  }
+}
+$('#export').click(function(){ 
+  var doc_id = '{{ doc_info[0]["document_id"] }}';
+  $.ajax({
+        url: "/exporttopdf",
+        type: "get",
+        dataType: "json",
+        data: {
+          doc_id,
+        },
+        success: function(response) {
+          var link = document.createElement('a');
+          link.href = response.url;
+          link.download = "{{ doc_info[0]['name'] }}" + ".pdf";
+          link.click();
+          link.remove();
+        }
+  });
+  });
+</script>
+
+<script>
+  $(window).ready(function(e){
+      window.updater = setInterval(updateText, 1000);
+  });
+
+  function updateText(){
+    var doc_id = '{{ doc_info[0]["document_id"] }}';
+    $.ajax({
+        url: "/getupdatedcontent",
+        type: "get",
+        dataType: "json",
+        data: {
+          doc_id
+        },
+        success: function(response) {
+
+          if('{{err}}' !== 'No new changes') {
+           $('#textbox_input').val(response);
+          }
+        },
+        error: function(xhr) {
+          //do nothing
+        }
+      });
+  }
+</script>
+
 <script>
   $("#textbox_input").keyup(function(){
+      clearInterval(window.updater);
+      window.updater = setInterval(updateText, 2500);
+      // restart timer if no input for 1s
+      
       var text = $(this).val();
       var doc_id = '{{ doc_info[0]["document_id"] }}';
       var client_id = '{{ client_id }}';
@@ -40,10 +102,10 @@ document id: <input type="text" style="width: 30%;" name="doc_id" value="{{doc_i
           client_id: client_id,
         },
         success: function(response) {
-          $("#place_for_suggestions").html(response);
+          //do nothing
         },
         error: function(xhr) {
-          //Do Something to handle error
+          //console.warn("Something went wrong sending your data")
         }
       });
   });
