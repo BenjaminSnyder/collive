@@ -1,4 +1,5 @@
-from flask.helpers import url_for
+from urllib.parse import urlparse
+from flask.helpers import send_file, url_for
 from flask.json import jsonify
 import requests
 import os
@@ -10,6 +11,7 @@ from doc_id import open_doc_id_database, update_doc_name, return_doc_name
 from tinydb import TinyDB, Query
 import json
 import pprint
+from io import BytesIO
 
 HOSTURL = os.environ.get('PRODUCTION') or '127.0.0.1'
 PORT = 5000
@@ -133,7 +135,7 @@ def get_updated_document_text():
     info = json.loads(response.text)
     if info[0].get('type') == 'error':
         return render_template('document.html', doc_info=info, client_id=client_id, error='No new changes')
-    print(info)
+    # print(info)
     return jsonify(info[1]['content'])
 
 
@@ -161,7 +163,7 @@ def send():
 
     headers = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw', 'Connection': 'keep-alive', 'Accept': '*/*'}
     params = {'client_id': client_id, 'doc_id': doc_id, 'content': content}
-    print(params)
+    # print(params)
     response = requests.post(url=f'http://{HOSTURL}:{PORT}/document/update', headers=headers, json=params)
     print(response)
     return jsonify({'success': True}), 200
@@ -170,6 +172,22 @@ def send():
     # info = json.loads(response.text)
     # print(info)
     # return render_template('document.html', doc_info=info, client_id=client_id)
+
+@app.route('/exporttopdf', methods=['GET'])
+def export():
+    data = request.values
+    doc_id = data['doc_id']
+    client_id = get_client_id(g.account)
+
+    headers = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw', 'Connection': 'keep-alive', 'Accept': '*/*'}
+    params = {'client_id': client_id, 'doc_id': doc_id}
+    response = requests.get(url=f'http://{HOSTURL}:{PORT}/document/export/pdf', headers=headers, params=params)
+    # print(response.json())
+    data = json.loads(response.text)
+    return data
+    # response = requests.get(url=data['url'])
+    # # name = urlparse(data['url']).path.rsplit('/')[-1]
+    # # return send_file(BytesIO(response.text.encode()), attachment_filename=f'{name}.pdf', as_attachment=True)
 
 
 @app.route('/share', methods=['POST'])
@@ -197,5 +215,5 @@ def share():
     response = requests.get(url=request_url, headers=headers)
     info = json.loads(response.text)
     flash("Shared with " + username + "!")
-    print(info)
+    # print(info)
     return redirect('document?doc_id={doc_id}'.format(doc_id=doc_id))

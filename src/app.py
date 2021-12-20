@@ -109,7 +109,7 @@ def delete_doc():
     return jsonify(msg)
 
 
-@app.route('/document/export/pdf')
+@app.route('/document/export/pdf', methods=['GET'])
 @authenticate
 def export_doc():
     '''returns the current revision to the user as a PDF document'''

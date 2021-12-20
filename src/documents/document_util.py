@@ -65,7 +65,7 @@ class Document_Util:
     def export_to_pdf(client_id, title, text):
         docx_file = Document_Util.export_to_docx(client_id, title, text)
         params = {
-            "FileName": f"{title}",
+            "FileName": f"{Document_Util._make_safe_filename(title)}",
             "File": convertapi.UploadIO(docx_file, f'{title}.docx'),
             "StoreFile": True,
             "Timeout": 15
@@ -88,12 +88,12 @@ class Document_Util:
         file.seek(0)
         return file
 
-    # def _make_safe_filename(s):
-    #     ''' ensures that filename is safe for filepath, code from stackoverflow'''
-    #     def safe_char(c):
-    #         if c.isalnum():
-    #             return c
-    #         else:
-    #             return "_"
-    #     return "".join(safe_char(c) for c in s).rstrip("_")
+    def _make_safe_filename(s):
+        ''' ensures that filename is safe for filepath, code from stackoverflow'''
+        def safe_char(c):
+            if c.isalnum():
+                return c
+            else:
+                return "_"
+        return "".join(safe_char(c) for c in s).rstrip("_")
 
