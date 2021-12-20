@@ -138,6 +138,11 @@ def get_updated_document_text():
     headers = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw', 'Connection': 'keep-alive', 'Accept': '*/*'}
     request_url = f'http://{HOSTURL}:{PORT}/document/get?doc_id={doc_id}&client_id={client_id}'
     response = requests.get(url=request_url, headers=headers)
+    code = response.status_code
+    error = response.text
+    if code != 200:
+        flash('{code} error: {error}'.format(code=code, error=error))
+        return redirect('index')
     info = json.loads(response.text)
     if info[0].get('type') == 'error':
         return render_template('document.html', doc_info=info, client_id=client_id, error='No new changes')
@@ -154,9 +159,8 @@ def display_document():
     response = requests.get(url=request_url, headers=headers)
     code = response.status_code
     error = response.text
-    info = json.loads(response.text)
     if code != 200:
-        flash('{code} error: {error}. {Info}'.format(code=code, error=error, Info=info))
+        flash('{code} error: {error}.'.format(code=code, error=error))
         return redirect('index')
     info = json.loads(response.text)
     if isinstance(info, dict):
@@ -177,6 +181,11 @@ def send():
     params = {'client_id': client_id, 'doc_id': doc_id, 'content': content}
     # print(params)
     response = requests.post(url=f'http://{HOSTURL}:{PORT}/document/update', headers=headers, json=params)
+    code = response.status_code
+    error = response.text
+    if code != 200:
+        flash('{code} error: {error}.'.format(code=code, error=error))
+        return redirect('index')
     print(response)
     return jsonify({'success': True}), 200
     # request_url = f'http://{HOSTURL}:{PORT}/document/get?doc_id={doc_id}&client_id={client_id}'
@@ -194,6 +203,11 @@ def export():
     headers = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw', 'Connection': 'keep-alive', 'Accept': '*/*'}
     params = {'client_id': client_id, 'doc_id': doc_id}
     response = requests.get(url=f'http://{HOSTURL}:{PORT}/document/export/pdf', headers=headers, params=params)
+    code = response.status_code
+    error = response.text
+    if code != 200:
+        flash('{code} error: {error}.'.format(code=code, error=error))
+        return redirect('index')
     # print(response.json())
     data = json.loads(response.text)
     return data
@@ -219,6 +233,11 @@ def share():
     headers = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw', 'Connection': 'keep-alive', 'Accept': '*/*'}
     request_url = f'http://{HOSTURL}:{PORT}/document/share'
     response = requests.post(url=request_url, headers=headers, json={'new_doc_users': [new_client_id], 'doc_id': doc_id, 'client_id': client_id})
+    code = response.status_code
+    error = response.text
+    if code != 200:
+        flash('{code} error: {error}.'.format(code=code, error=error))
+        return redirect('index')
     if response.json()['type'] == "error":
         flash(f"There was a problem! {response.json()['msg']}")
         return redirect('document?doc_id={doc_id}'.format(doc_id=doc_id))
@@ -230,7 +249,5 @@ def share():
     if code != 200:
         flash('{code} error: {error}'.format(code=code, error=error))
         return redirect('index')
-    info = json.loads(response.text)
     flash("Shared with " + username + "!")
-    # print(info)
     return redirect('document?doc_id={doc_id}'.format(doc_id=doc_id))
