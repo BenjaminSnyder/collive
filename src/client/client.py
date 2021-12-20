@@ -183,6 +183,7 @@ def send():
     # print(info)
     # return render_template('document.html', doc_info=info, client_id=client_id)
 
+
 @app.route('/exporttopdf', methods=['GET'])
 def export():
     data = request.values
