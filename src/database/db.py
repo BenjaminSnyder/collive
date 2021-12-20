@@ -106,7 +106,7 @@ def delete_document(token, doc_id):
 
 def get_user_documents(token, user):
     ret = {"documents": []}
-    db  = open_database(token)
+    db = open_database(token)
     Q = Query()
     for table in db.tables():
         doc = db.table(table)
