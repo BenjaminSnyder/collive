@@ -83,7 +83,7 @@ def test_delete_doc_invalid_inputs(client):
     rv = client.post('/document/delete', json=data, headers=headers)
 
     assert rv.status_code == 404
-    assert rv.data == b'{\n  "code": "EEXIST", \n  "msg": "Document -1 is identical to the revision. No changes were made.", \n  "type": "error"\n}\n'
+    assert rv.data == b'{\n  "code": "ENOTLOAD", \n  "msg": "Document not loaded", \n  "type": "error"\n}\n'
 
     data = dict(doc_id='0', client_id='-1')
     rv = client.post('/document/delete', json=data, headers=headers)
@@ -142,7 +142,7 @@ def test_get_doc_invalid_inputs(client):
     params = dict(doc_id=-1, client_id=0)
     rv = client.get('/document/get', query_string=params, headers=headers)
     assert rv.status_code == 404
-    assert rv.data == b'{\n  "code": "EEXIST", \n  "msg": "Document -1 is identical to the revision. No changes were made.", \n  "type": "error"\n}\n'
+    assert rv.data == b'{\n  "code": "ENOTLOAD", \n  "msg": "Document not loaded", \n  "type": "error"\n}\n'
 
     params = dict(doc_id=0, client_id=-1)
     rv = client.get('/document/get', query_string=params, headers=headers)

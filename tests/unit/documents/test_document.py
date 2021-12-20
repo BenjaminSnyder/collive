@@ -54,9 +54,8 @@ def test_get_revision_by_hash():
 
     response = doc.get_revision_by_hash("docyError", "error")
     assert response['type'] == "error"
-    assert response["code"] == "EEXIST"
-    assert response["msg"] == (f"Document docyError is identical to the revision. "
-                               "No changes were made.")
+    assert response["code"] == "ENOTLOAD"
+    assert response["msg"] == ("Document not loaded")
 
     response = doc.get_revision_by_hash(create_meta["document_id"], "error")
     assert response['type'] == "error"

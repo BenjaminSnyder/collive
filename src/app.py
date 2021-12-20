@@ -214,7 +214,7 @@ def check_input(keys: list, dict: dict):
                         "msg": f"{key} must be of type string"}
             if len(val) == 0:
                 return {"type": "error",
-                        "msg": f"{key} cannot be a empty string"}
+                        "msg": f"{key} cannot be an empty string"}
 
         except KeyError:
             return {"type": "error", "msg": f"{key} parameter missing"}
