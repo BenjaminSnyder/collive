@@ -116,6 +116,8 @@ def create_document():
     bearer = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw'}
     params = {'client_id': client_id, 'name': doc_name}
     response = requests.post(url=f'http://{HOSTURL}:{PORT}/document/create', headers=bearer, json=params)
+    code = response.status_code
+    error = response.text
     if code != 200:
         flash('{code} error: {error}'.format(code=code, error=error))
         return redirect('index')
