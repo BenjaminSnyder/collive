@@ -64,8 +64,7 @@ class Document():
                 self.token,
                 self.document_id)
             return result
-        else:
-            return db.error("EACCESS", self.document_id)
+        return db.error("EACCESS", self.document_id)
 
     def update_content(self, content, client_id):
         '''
@@ -94,9 +93,7 @@ class Document():
             result = db.update_meta(self.token, self.document_id,
                                     self.__convert_to_dict()[0])
             return result
-
-        else:
-            return db.error("EACCESS", self.document_id)
+        return db.error("EACCESS", self.document_id)
 
     def update_meta(self, name, users, viewers, client_id):
         '''
@@ -115,8 +112,7 @@ class Document():
             result = db.update_meta(self.token, self.document_id,
                                     self.__convert_to_dict()[0])
             return result
-        else:
-            return db.error("EACCESS", self.document_id)
+        return db.error("EACCESS", self.document_id)
 
     def create_document(self, name, client_id):
         '''
