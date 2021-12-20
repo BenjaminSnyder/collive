@@ -57,6 +57,7 @@ def test_delete_doc(client):
     assert rv.status_code == 200
     assert rv.data == b'{\n  "msg": "Deleted document with id 0", \n  "type": "success"\n}\n'
 
+
 def test_share(client):
     headers = {'Authorization': TOKEN}
     data = dict(client_id='1', doc_id='0', new_doc_users=['client22'], new_doc_viewers=['client23'])
@@ -67,6 +68,7 @@ def test_share(client):
     assert js['document_id'] == '0'
     assert 'client22' in js['users']
     assert 'client23' in js['viewers']
+
 
 def test_delete_doc_invalid_inputs(client):
     headers = {'Authorization': TOKEN}

@@ -178,9 +178,9 @@ def share_doc():
             return msg[0], 404
     
     name = msg[0]['name']
-    new_doc_users.extend(list(msg[0]['users']))
-    new_doc_viewers.extend(list(msg[0]['viewers']))
-    #print(name, new_doc_users, new_doc_viewers)
+    new_doc_users.extend(msg[0]['users'])
+    new_doc_viewers.extend(msg[0]['viewers'])
+    
     msg = doc.update_meta(name, new_doc_users, new_doc_viewers, input['client_id'])
     if msg["type"] == "error":
         return jsonify(msg), 400
