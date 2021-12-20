@@ -26,6 +26,8 @@ def test_create_insert_and_get():
 
     meta["name"] = "test document 3"
     rev["content"] = "third test document"
+
+    meta["users"].append("xyz_user")
     db.create_document(token, meta, rev)
 
     rev["revision_hash"] = "3333"
@@ -38,6 +40,9 @@ def test_create_insert_and_get():
     assert meta["name"] == "test document 3"
     assert rev["revision_hash"] == "3333"
     assert rev["content"] == "second document, rev 3"
+
+    test = db.get_user_documents(token, "xyz_user")
+    assert test["documents"][0]["document_id"] == create_meta["document_id"]
 
 
 def test_delete():

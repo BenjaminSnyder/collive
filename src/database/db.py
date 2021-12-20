@@ -104,6 +104,20 @@ def delete_document(token, doc_id):
     return error("EEXIST", doc_id)
 
 
+def get_user_documents(token, user):
+    ret = {"documents": []}
+    db  = open_database(token)
+    Q = Query()
+    for table in db.tables():
+        doc = db.table(table)
+        meta = doc.search(Q["type"] == "meta")[0]
+        if (user in meta["users"] or user in meta["viewers"]):
+            doc_dict = {"document_id": meta["document_id"], "name": meta["name"]}
+            ret["documents"].append(doc_dict)
+    print(ret)
+    return ret
+
+
 def error(type, arg):
     msg = ""
     if type == "ENOTLOAD":
