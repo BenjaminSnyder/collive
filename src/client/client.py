@@ -1,12 +1,12 @@
 import requests
 import os
-from flask import Flask, request, render_template, g, redirect, Response, flash, session
+from flask import Flask, request, render_template, g, redirect, Response, flash, session, jsonify
 from users import open_user_database, insert_user, validate_user, get_user_count, get_client_id
 from access import open_access_database, update_access, return_access, add_doc
 from doc_id import open_doc_id_database, update_doc_name, return_doc_name
 from tinydb import TinyDB, Query
 import json
-import pprint
+from werkzeug.exceptions import HTTPException
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -104,6 +104,12 @@ def create_document():
     bearer = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw'}
     params = {'client_id': client_id, 'name': doc_name}
     response = requests.post(url='http://127.0.0.1:5000/document/create', headers=bearer, json=params)
+    code = response.status_code
+    error = response.text
+    print(code, error)
+    if code != 200:
+        flash('{code} error: {error}'.format(code=code, error=error))
+        return redirect('index')
     info = json.loads(response.text)
     add_doc(g.account, str(info['document_id']))
     update_doc_name(str(info['document_id']), str(info['name']))
@@ -118,6 +124,11 @@ def display_document():
     headers = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw', 'Connection': 'keep-alive', 'Accept': '*/*'}
     request_url = 'http://127.0.0.1:5000/document/get?doc_id={doc_id}&client_id={client_id}'.format(doc_id=doc_id, client_id=client_id)
     response = requests.get(url=request_url, headers=headers)
+    code = response.status_code
+    error = response.text
+    if code != 200:
+        flash('{code} error: {error}'.format(code=code, error=error))
+        return redirect('index')
     info = json.loads(response.text)
     print(info)
     return render_template('document.html', doc_info=info, client_id=client_id)
@@ -139,6 +150,11 @@ def send():
     request_url = 'http://127.0.0.1:5000/document/get?doc_id={doc_id}&client_id={client_id}'.format(doc_id=doc_id, client_id=client_id)
     response = requests.get(url=request_url, headers=headers)
     info = json.loads(response.text)
+    code = response.status_code
+    error = response.text
+    if code != 200:
+        flash('{code} error: {error}'.format(code=code, error=error))
+        return redirect('index')
     print(info)
     return render_template('document.html', doc_info=info, client_id=client_id)
 
@@ -153,6 +169,11 @@ def share():
     headers = {'Authorization': 'Bearer f2dOqweIWy65QWlwiw', 'Connection': 'keep-alive', 'Accept': '*/*'}
     request_url = 'http://127.0.0.1:5000/document/get?doc_id={doc_id}&client_id={client_id}'.format(doc_id=doc_id, client_id=client_id)
     response = requests.get(url=request_url, headers=headers)
+    code = response.status_code
+    error = response.text
+    if code != 200:
+        flash('{code} error: {error}'.format(code=code, error=error))
+        return redirect('index')
     info = json.loads(response.text)
     flash("Shared with " + username + "!")
     print(info)
