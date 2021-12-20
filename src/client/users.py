@@ -22,7 +22,7 @@ def validate_user(username, password):
         pair = db.search(user['username'] == username)
         if not pair:
             return False
-        elif pair[0]['password'] == password:
+        if pair[0]['password'] == password:
             return True
 
 def get_user_count():

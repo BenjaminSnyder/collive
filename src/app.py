@@ -26,7 +26,7 @@ def get_doc():
     if not doc_id:
         return jsonify({"type": "error",
                         "msg": "doc_id parameter missing"}), 400
-    elif not client_id:
+    if not client_id:
         return jsonify({"type": "error",
                         "msg": "client_id parameter missing"}), 400
 
@@ -35,8 +35,7 @@ def get_doc():
     if out[0]["type"] == "error":
         if out[0]["code"] == "EACCESS":
             return out[0], 403
-        else:
-            return out[0], 404
+        return out[0], 404
     return jsonify(out)
 
 
@@ -61,14 +60,12 @@ def update_doc():
     if msg[0]["type"] == "error":
         if msg[0]["code"] == "EACCESS":
             return msg[0], 403
-        else:
-            return msg[0], 404
+        return msg[0], 404
 
     msg = doc.update_content(input['content'], input['client_id'])
     if msg["type"] == "error":
         return jsonify(msg), 400
-    else:
-        return jsonify(msg), 200
+    return jsonify(msg), 200
 
 
 @app.route('/document/create', methods=['POST'])
@@ -104,8 +101,7 @@ def delete_doc():
     if msg[0]["type"] == "error":
         if msg[0]["code"] == "EACCESS":
             return msg[0], 403
-        else:
-            return msg[0], 404
+        return msg[0], 404
     msg = doc.delete_document(input['client_id'])
     if msg["type"] == "error":
         return jsonify(msg), 400
@@ -122,7 +118,7 @@ def export_doc():
     if not doc_id:
         return jsonify({"type": "error",
                         "msg": "doc_id parameter missing"}), 400
-    elif not client_id:
+    if not client_id:
         return jsonify({"type": "error",
                         "msg": "client_id parameter missing"}), 400
 
@@ -175,8 +171,7 @@ def share_doc():
     if msg[0]["type"] == "error":
         if msg[0]["code"] == "EACCESS":
             return msg[0], 403
-        else:
-            return msg[0], 404
+        return msg[0], 404
     
     name = msg[0]['name']
     new_doc_users.extend(list(msg[0]['users']))
@@ -195,7 +190,7 @@ def check_input(keys: list, dict: dict):
             if type(val) != str:
                 return {"type": "error",
                         "msg": f"{key} must be of type string"}
-            elif len(val) == 0:
+            if len(val) == 0:
                 return {"type": "error",
                         "msg": f"{key} cannot be an empty string"}
 

@@ -32,5 +32,4 @@ def return_access(username):
         pair = db.search(user['username'] == username)
         if not pair:
             return []
-        else:
-            return pair[0]['documents']
+        return pair[0]['documents']

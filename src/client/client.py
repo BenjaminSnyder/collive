@@ -88,8 +88,7 @@ def register():
                 db.insert({'username': username, 'password': password, 'client_id': client_id})
                 flash('Registration successful, ' + username + '. You may proceed to login.')
                 return redirect('login')
-            else:
-                error = 'Username already exists.'
+            error = 'Username already exists.'
         flash(error)
     return render_template('register.html')
 

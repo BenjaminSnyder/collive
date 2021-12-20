@@ -23,5 +23,4 @@ def return_doc_name(doc_id):
             name = result[0]['doc_name']
         if not name:
             return None
-        else:
-            return name
+        return name
