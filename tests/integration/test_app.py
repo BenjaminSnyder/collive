@@ -165,7 +165,6 @@ def test_export_pdf(client):
     #     ''' test invalid case '''
     #     url = rv.get_json()['url']
     #     assert rv.status_code == 200
-        
 
     '''test valid case'''
     headers = {'Authorization': TOKEN}

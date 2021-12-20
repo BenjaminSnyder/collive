@@ -44,7 +44,7 @@ def test_create_insert_and_get():
     test = db.get_user_documents(token, "xyz_user")
     highest = -1
     for doc in test["documents"]:
-        highest=max(int(doc['document_id']), highest)
+        highest = max(int(doc['document_id']), highest)
     assert str(highest) == create_meta["document_id"]
 
 
