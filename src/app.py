@@ -2,6 +2,7 @@ from flask import Flask, json, request, jsonify
 from requests.api import get
 
 from documents.document import Document
+from database import db
 
 from authentication.auth import authenticate
 
@@ -183,7 +184,7 @@ def share_doc():
         return jsonify(msg), 400
     return jsonify(msg)
 
-@app.route('/document/get/all', methods=['POST'])
+@app.route('/client/get/documents', methods=['POST'])
 @authenticate
 def get_all_docs():
     '''Gets all doc_ids of a client'''
@@ -194,15 +195,8 @@ def get_all_docs():
     if err is not None:
         return err, 400
 
-    doc = Document(access_token)
-    msg = doc.load_document(input['doc_id'], input['client_id'])
-    if msg[0]["type"] == "error":
-        if msg[0]["code"] == "EACCESS":
-            return msg[0], 403
-        return msg[0], 404
-
-    msg = doc.get_all_docs(input['client_id'])
-    if msg["type"] == "error":
+    msg = db.get_all_docs(access_token, input['client_id'])
+    if msg['type'] == 'error':
         return jsonify(msg), 400
     return jsonify(msg), 200
 
