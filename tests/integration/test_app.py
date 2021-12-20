@@ -171,7 +171,6 @@ def test_export_pdf(client):
     assert rv.status_code == 200
 
 
-
 '''
 def test_export_pdf_invalid_secret(client):
 
